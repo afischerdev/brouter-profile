@@ -4,9 +4,9 @@ This is based on the work of the BRouter project. Please see [Git](https://githu
 and [Google Play](https://play.google.com/store/apps/details?id=btools.routingapp) or [F-Droid](https://f-droid.org/packages/btools.routingapp) for installation.
 
 There are some files for use:
-* waterway.brf                 works with standard lookup table and standard data files
-* waterway_mod.brf             works with lookup_mod table and standard data files
-* waterway_future.brf          needs new data files and new lookup table, should work wiht CEMT definitions
+* waterway.brf - works with standard lookup table and standard data files
+* waterway_mod.brf - works with lookup_mod table and standard data files
+* waterway_future.brf - needs new data files and new lookup table, should work with CEMT definitions
 
 After installation copy the files waterway.brf to the brouter/profiles2 folder.
 This works with the standard lookups.dat tag table. To get some more option you need to copy lookups_mod.dat and waterway_mod.brf and rename lookups.dat.
