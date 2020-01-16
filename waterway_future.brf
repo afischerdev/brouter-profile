@@ -1,0 +1,92 @@
+---context:global   # following code refers to global config
+
+assign   turnInstructionMode  = 1  # 0=none, 1=auto-choose, 2=locus-style, 3=osmand-style, 4=comment-style, 5=gpsies
+
+
+#assign   shortest_way             0    # 0 as default
+
+assign waiting_cost 50
+
+# in meter
+assign boat_height	2.5
+assign boat_width	2.2
+assign boat_length	10.0
+assign boat_draft	1.2
+
+# https://wiki.openstreetmap.org/wiki/Key:CEMT
+assign boat_class   0
+
+
+# the elevation parameters
+
+assign downhillcost 0
+assign downhillcutoff 1.5
+assign uphillcost 0
+assign uphillcutoff 1.5
+
+---context:way   # following code refers to way-tags
+
+# to use this an update for lokkup.dat is recommended
+assign pass_bridge 
+	if seamark:type=bridge then (
+        # if greater seamark:bridge:clearance_height boat_height then false 
+        true
+        )
+	else true
+	
+# to use this an update for lokkup.dat is recommended
+assign pass_lock 
+	if seamark:type=lock_basin then (
+		true
+		)
+	else true
+
+assign this_class
+    if      CEMT=0       then 1
+    else if CEMT=I       then 2
+    else if CEMT=II      then 3
+    else if CEMT=III     then 4
+    else if CEMT=IV      then 5
+    else if CEMT=Va      then 6
+    else if CEMT=Vb      then 7
+    else if CEMT=VIa     then 8
+    else if CEMT=VIb     then 9
+    else if CEMT=VIc     then 10
+    else if CEMT=VII     then 11
+    else
+        0
+	
+assign turncost 0
+
+assign initialcost 
+    if waterway=riverbank           then 10000
+    else if waterway=weir           then 10000
+    else if waterway=dam            then 10000
+    else if waterway=fish_pass      then 10000
+ 	else if not pass_bridge			then 10000
+	else if not pass_lock			then 10000
+#    else if greater this_class boat_class		then 10000
+    else 0
+
+
+assign costfactor
+	if      seamark:type=fairway    then 1
+	else if seamark:type=lock_basin then 1
+	else if waterway=canal 			then 1
+	else if waterway=river 			then 1
+	else if waterway=safe_water		then 1
+	else if waterway=stream 		then 1
+  	else if waterway=fairway        then 1
+  	else if waterway=narrow         then 1
+	else if waterway=lock			then waiting_cost
+	else if waterway=dock			then waiting_cost
+	else if waterway=tidal_flat_slough	then waiting_cost
+	else if seamark:type=recommended_track	then 1
+	else if motorboat=yes           then 1
+  	else 10000
+
+
+---context:node  # following code refers to node tags
+
+assign initialcost 
+	0
