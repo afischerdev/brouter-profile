@@ -372,17 +372,10 @@ seamark:type;0000522 fairway
 seamark:type;0000000001 lock_basin
 seamark:type;0000000001 bridge
 
-waterway;0000000001 safe_water
-waterway;0000000001 stream
-waterway;0000000001 narrow
-
-waterway;0000001647 lock_gate
-
 waterway;0000016046 river
 waterway;0000009496 canal
 waterway;0000007876 riverbank
 waterway;0000002202 weir
-waterway;0000000425 waterfall
 waterway;0000001364 dam
 waterway;0000000386 lock
 waterway;0000000321 tidal_flat_slough
@@ -392,6 +385,9 @@ waterway;0000000113 fish_pass
 waterway;0000000086 boatyard
 waterway;0000000071 fairway
 waterway;0000000059 lock_gate
+waterway;0000000001 safe_water
+waterway;0000000001 stream
+waterway;0000000001 narrow
 
 boat;0000019888 no
 boat;0000002718 yes

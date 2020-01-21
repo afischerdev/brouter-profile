@@ -3,7 +3,7 @@
 assign   turnInstructionMode  = 1  # 0=none, 1=auto-choose, 2=locus-style, 3=osmand-style, 4=comment-style, 5=gpsies
 
 
-#assign   shortest_way             0    # 0 as default
+assign   shortest_way             1    # 0 as default
 
 assign waiting_cost 10
 

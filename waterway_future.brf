@@ -3,19 +3,26 @@
 assign   turnInstructionMode  = 1  # 0=none, 1=auto-choose, 2=locus-style, 3=osmand-style, 4=comment-style, 5=gpsies
 
 
-#assign   shortest_way             0    # 0 as default
+assign   shortest_way             1   # 0 as default
+assign   cost1speed               7   # kmh
+assign   showspeed                1
 
-assign waiting_cost 50
+assign waiting_cost 10
 
-# in meter
+# in meter (not used now)
 assign boat_height	2.5
 assign boat_width	2.2
 assign boat_length	10.0
 assign boat_draft	1.2
 
 # https://wiki.openstreetmap.org/wiki/Key:CEMT
-assign boat_class   0
+# https://wiki.openstreetmap.org/wiki/Inland_navigation
 
+# CEMT is available in this region
+assign can_use_CEMT     true
+
+# my boat is CEMT class (decimal)
+assign boat_class   1
 
 # the elevation parameters
 
@@ -30,6 +37,7 @@ assign uphillcutoff 1.5
 assign pass_bridge 
 	if seamark:type=bridge then (
         # if greater seamark:bridge:clearance_height boat_height then false 
+        # else if seamark:bridge:category=fixed then false else
         true
         )
 	else true
@@ -41,21 +49,30 @@ assign pass_lock
 		)
 	else true
 
-assign this_class
-    if      CEMT=0       then 1
-    else if CEMT=I       then 2
-    else if CEMT=II      then 3
-    else if CEMT=III     then 4
-    else if CEMT=IV      then 5
-    else if CEMT=Va      then 6
-    else if CEMT=Vb      then 7
-    else if CEMT=VIa     then 8
-    else if CEMT=VIb     then 9
-    else if CEMT=VIc     then 10
-    else if CEMT=VII     then 11
+assign this_class                       # len       width 	draught 	height
+    if      CEMT=0       then 1         # used in NL for recreational boating fairways 
+    else if CEMT=I       then 2         # 38,50 	5,05 	1,8-2,2 	4
+    else if CEMT=II      then 3         # 50-55 	6,6 	2,5 	    4-5
+    else if CEMT=III     then 4         # 67-80 	8,2 	2,5 	    4-5
+    else if CEMT=IV      then 5         # 80-85 	9,5 	2,5 	    5,25-7
+    else if CEMT=Va      then 6         # 95-110 	11,4 	2,5-4,5 	5,25-7
+    else if CEMT=Vb      then 7         # 172-185 	11,4 	2,5-4,5 	5,25-9,1
+    else if CEMT=VIa     then 8         # 95-110 	22,8 	2,5-4,5 	7-9,1
+    else if CEMT=VIb     then 9         # 185-195 	22,8 	2,5-4,5 	7-9,1
+    else if CEMT=VIc     then 10        # 193-200 	34,2 	2,5-4,5 	9,1
+    else if CEMT=VII     then 11        # 195/285 	34,2 	2,5-4,5 	9,1
     else
         0
 	
+assign	use_CEMT 
+    if not CEMT= then (
+        if motorboat=no then false
+        else if greater this_class boat_class then true
+        else
+            false
+    )
+    else false
+
 assign turncost 0
 
 assign initialcost 
@@ -63,27 +80,36 @@ assign initialcost
     else if waterway=weir           then 10000
     else if waterway=dam            then 10000
     else if waterway=fish_pass      then 10000
+#    else if waterway=waterfall      then 10000
  	else if not pass_bridge			then 10000
 	else if not pass_lock			then 10000
-#    else if greater this_class boat_class		then 10000
-    else 0
+    else
+    0
 
 
 assign costfactor
-	if      seamark:type=fairway    then 1
-	else if seamark:type=lock_basin then 1
-	else if waterway=canal 			then 1
-	else if waterway=river 			then 1
-	else if waterway=safe_water		then 1
-	else if waterway=stream 		then 1
-  	else if waterway=fairway        then 1
-  	else if waterway=narrow         then 1
-	else if waterway=lock			then waiting_cost
-	else if waterway=dock			then waiting_cost
-	else if waterway=tidal_flat_slough	then waiting_cost
-	else if seamark:type=recommended_track	then 1
-	else if motorboat=yes           then 1
-  	else 10000
+    if  can_use_CEMT then (
+        if use_CEMT then 1
+        else    
+            10000
+    )
+    else (
+        if waterway= then 10000
+        else if seamark:type=fairway    then 1
+        else if seamark:type=lock_basin then 2
+		else if waterway=canal 			then 1
+		else if waterway=river 			then 1
+		else if waterway=safe_water		then 1
+	  	else if waterway=fairway        then 1
+	  	else if waterway=narrow         then 1
+        else if waterway=stream 		then 2
+		else if waterway=lock			then waiting_cost
+		else if waterway=dock			then waiting_cost
+		else if waterway=tidal_flat_slough	then waiting_cost
+		else if seamark:type=recommended_track	then 1
+		else if motorboat=yes           then 1
+	  	else 10000
+    )
 
 
 ---context:node  # following code refers to node tags
