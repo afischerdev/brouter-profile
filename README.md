@@ -8,6 +8,8 @@ There are some files for use:
 * waterway_mod.brf . works with lookup_mod table and standard data files
 * waterway_future.brf . needs new data files and new lookup table, work with CEMT definitions (use segement4 sample data - no srtm, NL only)
 * waterway_future_more.brf . contains some extra ideas
+* folder brouter_one contains an update for brouter classes, lookup and waterway.brf for that
+
 
 After installation copy the files waterway.brf to the brouter/profiles2 folder.
 This works with the standard lookups.dat tag table. To get some more option you need to copy lookups_mod.dat and waterway_mod.brf and rename lookups.dat.

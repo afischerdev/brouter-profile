@@ -1,0 +1,189 @@
+---model:btools.router.WaterwayModel
+---context:global   # following code refers to global config
+
+# user values
+
+# my boat in meter
+assign boat_height	1.5
+assign boat_width	2.2
+assign boat_length	10.0	#  (not used now)
+assign boat_draft	1.2		#  (not used now)
+
+# my boat is CEMT class (decimal)
+assign boat_class   1
+
+# my boat has max speed
+# assign boat_maxspeed 	     10
+assign  maxSpeed             18  # km/h (Caution: this is case sensitive internal parameter and different to maxspeed)
+                                 # handle with care, this belongs to your local area and your boat
+assign  speed_with_stream    18  # speed in the direction of flow
+assign  speed_against_stream  8  # against the flow
+assign  speed_normal         13  # no flow
+
+# global values
+
+assign   validForBikes            1
+assign   validForCars             0
+assign   validForFoot             0
+
+assign totalMass  = 1000     # %totalMass% | Mass (in kg) of the bike + biker, for travel time computation | number
+assign bikerPower = 15000    # %bikerPower% | Average power (in W) provided by the biker, for travel time computation | number
+
+assign   shortest_way             1   # 0 as default
+
+#assign   vmax 		              20
+
+assign   turnInstructionMode      1   # 0=none, 1=auto-choose, 2=locus-style, 3=osmand-style, 4=comment-style, 5=gpsies
+assign   processUnusedTags        1   # lists all (incl. unused) key/value pairs in geojson
+
+assign   cost1speed               20  # kmh
+assign   inverseRouting           1
+assign   showspeed                1   # show speed instead of elevation (geojson)
+
+assign   waiting_lock 			  900    # in seconds for one lock_gate
+assign   waiting_bridge			  900    # in seconds
+assign   around_time			  900    # in seconds
+
+assign   notdefined               10000
+
+
+# https://wiki.openstreetmap.org/wiki/Key:CEMT
+# https://wiki.openstreetmap.org/wiki/Inland_navigation
+
+# CEMT is available in this region
+assign can_use_CEMT               true
+
+
+
+---context:way   # following code refers to way-tags
+
+assign control_draft
+    switch and not waterway= not maxdraft=   true 
+    switch and not waterway= not draft=      true 
+	false
+	
+assign pass_lock 
+	if seamark:type=lock_basin then (
+		true
+		)
+	else false
+
+assign this_class                       # len       width 	draught 	height
+    if      CEMT=0       then 1         # used in NL for recreational boating fairways 
+    else if CEMT=I       then 2         # 38,50 	5,05 	1,8-2,2 	4
+    else if CEMT=II      then 3         # 50-55 	6,6 	2,5 	    4-5
+    else if CEMT=III     then 4         # 67-80 	8,2 	2,5 	    4-5
+    else if CEMT=IV      then 5         # 80-85 	9,5 	2,5 	    5,25-7
+    else if CEMT=V       then 6         # 95-110 	11,4 	2,5-4,5 	5,25-7
+    else if CEMT=Va      then 6         # 95-110 	11,4 	2,5-4,5 	5,25-7
+    else if CEMT=Vb      then 7         # 172-185 	11,4 	2,5-4,5 	5,25-9,1
+    else if CEMT=VI      then 8         # 95-110 	22,8 	2,5-4,5 	7-9,1
+    else if CEMT=VIa     then 8         # 95-110 	22,8 	2,5-4,5 	7-9,1
+    else if CEMT=VIb     then 9         # 185-195 	22,8 	2,5-4,5 	7-9,1
+    else if CEMT=VIc     then 10        # 193-200 	34,2 	2,5-4,5 	9,1
+    else if CEMT=VII     then 11        # 195/285 	34,2 	2,5-4,5 	9,1
+    else
+        0
+	
+assign	use_CEMT 
+    if not CEMT= then (
+        # if motorboat=no then false
+        # else if greater this_class boat_class then true
+        # else
+		switch motorboat=no false
+		switch CEMT=0|I|II|III|IV|V|Va|Vb|VI|VIa|VIb|VIc true	# make sure to drop classes you can't use
+        false
+    )
+    else 
+	    false
+		
+		
+assign boat_maxspeed =
+  switch and waterway=river reversedirection=yes speed_against_stream
+  switch and waterway=river reversedirection= speed_with_stream
+  speed_normal
+
+
+assign maxspeed_impl =
+  switch CEMT=0                 10 # 6
+  switch CEMT=I|II|III|IV       10
+  switch CEMT=V|Va|Vb           10 # 12
+  switch CEMT=VI|VIa|VIb|VIc    15
+  20
+  
+assign maxspeed_expl =
+  switch maxspeed=  notdefined
+  switch maxspeed=6 6
+  switch maxspeed=9 9
+  switch maxspeed=4.5 4.5
+  switch maxspeed=5 5
+  switch maxspeed=7 7
+  switch maxspeed=8 8
+  switch maxspeed=10 10
+  switch maxspeed=12 12
+  switch maxspeed=13 13
+  switch maxspeed=13.5 13.5
+  switch maxspeed=15 15
+  switch maxspeed=16 16
+  switch maxspeed=25 25
+  notdefined
+
+assign maxspeed_defined 
+  switch lesser maxspeed_expl notdefined maxspeed_expl maxspeed_impl 
+  
+assign maxspeed =
+  min maxspeed_defined boat_maxspeed
+
+assign turncost 0
+
+#assign initialcost 0
+
+assign initialcost 
+ 	if waterway=riverbank           then around_time
+    else if waterway=weir           then around_time
+    else if waterway=dam            then around_time
+    else if waterway=fish_pass      then around_time
+    else
+    0
+
+
+
+assign costfactor
+    if  use_CEMT then (
+      	1
+    )
+    else (
+        if      waterway=               then 10000
+        else if seamark:type=fairway    then 1
+		else if waterway=canal 			then 1
+		else if waterway=river 			then 1
+		else if waterway=safe_water		then 1
+	  	else if waterway=fairway        then 1
+	  	else if waterway=narrow         then 1
+        else if waterway=stream 		then 10000
+		# else if waterway=lock			then waiting_lock
+		else if waterway=dock			then 10000
+		else if waterway=tidal_flat_slough	then 10000
+		else if seamark:type=recommended_track	then 1
+		else if motorboat=yes           then 1
+	  	else   
+    		15000
+    )
+
+
+---context:node  # following code refers to node tags
+
+assign control_bridge_fixed_height
+    if seamark:bridge:category=fixed then  true 
+	else false
+
+assign control_bridge_opening_height
+    if seamark:bridge:category=opening then  true 
+	else false
+
+
+assign initialcost 
+	switch waterway=lock_gate  waiting_lock
+	switch seamark:bridge:category=opening waiting_bridge
+    switch waterway=waterfall  around_time
+	0
