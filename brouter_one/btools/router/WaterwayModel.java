@@ -36,6 +36,7 @@ final class WaterwayModel extends OsmPathModel
   public  int bridgeWaitingTime;
 
   public  int key_clearance_height_closed;
+  public  int key_clearance_height_open;
   public  int key_clearance_height;
   public  int key_clearance_height_safe;
   public  int key_vertical_clearance_safe;
@@ -62,6 +63,7 @@ final class WaterwayModel extends OsmPathModel
     bridgeWaitingTime = (int) getParam( "waiting_bridge", 0f );
 	
 	key_clearance_height_closed = expctxNode.getLookupKey("seamark:bridge:clearance_height_closed");
+	key_clearance_height_open = expctxNode.getLookupKey("seamark:bridge:clearance_height_open");
 	key_clearance_height = expctxNode.getLookupKey("seamark:bridge:clearance_height");
 	key_clearance_height_safe = expctxNode.getLookupKey("seamark:bridge:clearance_height_safe");
 	key_vertical_clearance_safe = expctxNode.getLookupKey("seamark:cable_overhead:vertical_clearance_safe");
@@ -70,6 +72,7 @@ final class WaterwayModel extends OsmPathModel
 	key_maxdraft = expctxWay.getLookupKey("maxdraft");
 	if (DEBUG) {
 		System.out.println( "key_clearance_height_closed " + key_clearance_height_closed);
+		System.out.println( "key_clearance_height_open " + key_clearance_height_open);
 	    System.out.println( "key_clearance_height " + key_clearance_height);
 	    System.out.println( "key_clearance_height_safe " + key_clearance_height_safe);
 	    System.out.println( "key_vertical_clearance_safe " + key_vertical_clearance_safe);

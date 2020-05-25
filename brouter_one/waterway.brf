@@ -58,6 +58,8 @@ assign can_use_CEMT               true
 ---context:way   # following code refers to way-tags
 
 assign control_draft
+	switch and CEMT=0 not maxdraft=          true 
+	switch and CEMT=0 not draft=             true 
     switch and not waterway= not maxdraft=   true 
     switch and not waterway= not draft=      true 
 	false
@@ -91,7 +93,8 @@ assign	use_CEMT
         # else if greater this_class boat_class then true
         # else
 		switch motorboat=no false
-		switch CEMT=0|I|II|III|IV|V|Va|Vb|VI|VIa|VIb|VIc true	# make sure to drop classes you can't use
+		switch ship=no false
+		switch CEMT=0|I|II|III|IV|V|Va|Vb|VI|VIa|VIb|VIc|VII true	# make sure to drop classes you can't use
         false
     )
     else 
@@ -105,10 +108,10 @@ assign boat_maxspeed =
 
 
 assign maxspeed_impl =
-  switch CEMT=0                 10 # 6
-  switch CEMT=I|II|III|IV       10
-  switch CEMT=V|Va|Vb           10 # 12
-  switch CEMT=VI|VIa|VIb|VIc    15
+  switch CEMT=0                     10 # 6
+  switch CEMT=I|II|III|IV           10
+  switch CEMT=V|Va|Vb               10 # 12
+  switch CEMT=VI|VIa|VIb|VIc|VII    15
   20
   
 assign maxspeed_expl =
@@ -125,6 +128,7 @@ assign maxspeed_expl =
   switch maxspeed=13.5 13.5
   switch maxspeed=15 15
   switch maxspeed=16 16
+  switch maxspeed=20 20
   switch maxspeed=25 25
   notdefined
 
@@ -136,11 +140,9 @@ assign maxspeed =
 
 assign turncost 0
 
-#assign initialcost 0
 
 assign initialcost 
- 	if waterway=riverbank           then around_time
-    else if waterway=weir           then around_time
+    if waterway=weir                then around_time
     else if waterway=dam            then around_time
     else if waterway=fish_pass      then around_time
     else
@@ -160,12 +162,9 @@ assign costfactor
 		else if waterway=safe_water		then 1
 	  	else if waterway=fairway        then 1
 	  	else if waterway=narrow         then 1
-        else if waterway=stream 		then 10000
-		# else if waterway=lock			then waiting_lock
-		else if waterway=dock			then 10000
-		else if waterway=tidal_flat_slough	then 10000
 		else if seamark:type=recommended_track	then 1
 		else if motorboat=yes           then 1
+		else if ship=yes                then 1
 	  	else   
     		15000
     )
@@ -181,7 +180,10 @@ assign control_bridge_opening_height
     if seamark:bridge:category=opening then  true 
 	else false
 
-
+assign control_bridge_width
+    if not seamark:bridge:clearance_width= then true
+	else false
+	
 assign initialcost 
 	switch waterway=lock_gate  waiting_lock
 	switch seamark:bridge:category=opening waiting_bridge

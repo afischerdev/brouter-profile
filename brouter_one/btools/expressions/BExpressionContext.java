@@ -286,6 +286,7 @@ public abstract class BExpressionContext implements IByteArrayUnifier
 	float res = 0f;
     decode( lookupData, inverseDirection, ab );
 	int val = lookupData[key];
+	if (val == 0) return -1f;
 	res = (val-1000)/100f;
     return 	res;
   }
