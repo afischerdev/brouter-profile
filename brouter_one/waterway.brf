@@ -4,10 +4,10 @@
 # user values
 
 # my boat in meter
-assign boat_height	1.5
-assign boat_width	2.2
-assign boat_length	10.0	#  (not used now)
-assign boat_draft	1.2		#  (not used now)
+assign boat_height	1.5     # %boat_height% | Boat height in Meter | number
+assign boat_width	2.2     # %boat_width% | Boat width in Meter | number
+assign boat_length	10.0	# Boat height in Meter | (not used now)
+assign boat_draft	1.2		# %boat_draft% | Boat draft in Meter | number
 
 # my boat is CEMT class (decimal)
 assign boat_class   1
@@ -26,8 +26,8 @@ assign   validForBikes            1
 assign   validForCars             0
 assign   validForFoot             0
 
-assign totalMass  = 1000     # %totalMass% | Mass (in kg) of the bike + biker, for travel time computation | number
-assign bikerPower = 15000    # %bikerPower% | Average power (in W) provided by the biker, for travel time computation | number
+assign totalMass  = 1000     # unused at the moment xtotalMass% | Mass (in kg) of the bike + biker, for travel time computation | number
+assign bikerPower = 15000    # unused at the moment xbikerPower% | Average power (in W) provided by the biker, for travel time computation | number
 
 assign   shortest_way             1   # 0 as default
 
@@ -60,8 +60,10 @@ assign can_use_CEMT               true
 assign control_draft
 	switch and CEMT=0 not maxdraft=          true 
 	switch and CEMT=0 not draft=             true 
+	switch and CEMT=0 not depth=             true
     switch and not waterway= not maxdraft=   true 
     switch and not waterway= not draft=      true 
+    switch and not waterway= not depth=      true 
 	false
 	
 assign pass_lock 
@@ -171,6 +173,12 @@ assign costfactor
 
 
 ---context:node  # following code refers to node tags
+
+assign control_node_draft
+	switch not maxdraft= true
+	switch not depth= true
+	switch not water:depth= true
+	false
 
 assign control_bridge_fixed_height
     if seamark:bridge:category=fixed then  true 

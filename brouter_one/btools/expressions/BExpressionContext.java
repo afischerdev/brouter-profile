@@ -637,9 +637,38 @@ public abstract class BExpressionContext implements IByteArrayUnifier
 		  // found value for lookup *
 		  //System.out.println( "add unknown " + name + "  " + value );	
 		  try {
+			value = value.replace(",", ".");
+			if (value.contains("ft")) {
+				value = value.replace("_", "");
+				float foot = 0f;
+				int inch = 0;
+				String[] sa = value.trim().split("ft");
+				if (sa.length >= 1) foot = Float.parseFloat(sa[0].trim());
+				if (sa.length == 2) {
+					value = sa[1];
+					if (value.indexOf("in") > 0) value = value.substring(0,value.indexOf("in"));
+					inch = Integer.parseInt(value.trim());
+					foot += inch/12f;
+				}
+				value = Float.toString(foot*0.3048f);
+			}	  
+			else if (value.contains("in")) {
+				value = value.replace("_", "");
+				float inch = 0f;
+				if (value.indexOf("in") > 0) value = value.substring(0,value.indexOf("in"));
+				inch = Float.parseFloat(value.trim());
+				value = Float.toString(inch*0.0254f);
+			}
+			else if (value.contains("m")) {
+				value = value.replace("_", "");
+				String[] sa = value.trim().split("m");
+				if (sa.length == 1) value = sa[0].trim();
+			
+			}	  
 			// found negative maxdraft values
 		    lookupData2[inum] = 1000 + (int)(Math.abs(Float.parseFloat(value))*100f);		  
 		  } catch ( Exception e) {
+			System.out.println( "error for " + name + "  " + value + " " + e.getMessage());	
 			lookupData2[inum] = 1;
 		  }
 	    } 

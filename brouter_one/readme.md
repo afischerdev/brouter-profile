@@ -1,6 +1,8 @@
 # BRouter working with waterway
 
+
 This folder contains an idea for BRouter project to integrate variable values in the lookup table.
+Please see [BRouter feature request ](https://github.com/abrensch/brouter/issues/233)
 
 like:
 

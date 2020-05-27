@@ -425,6 +425,8 @@ waterway;0000000001 ditch
 
 draft;0000000001 *
 maxdraft;0000000001 *
+depth;0000000001 *
+passage_time;0000000001 *
 
 lock;0000000001 yes               
 
@@ -434,9 +436,11 @@ boat;0000002718 yes permissive
 motorboat;0000001077 yes
 motorboat;0000000808 no private privat
  
-
 ship;0000001077 yes
 ship;0000000808 no
+
+canoe;0000000808 yes
+canoe;0000000808 no
 
 CEMT;0000000001 0
 CEMT;0000000001 I
@@ -918,7 +922,9 @@ seamark:bridge:clearance_height_safe;0000000001 *
 seamark:bridge:clearance_height_closed;0000000001 *
 seamark:bridge:clearance_height_open;0000000001 *
 
-seamark:cable_overhead:vertical_clearance_safe;0000000001 *
+maxdraft;0000000001 *
+depth;0000000001 *
+water:depth;0000000001 *
 
 seamark:bridge:clearance_width;0000000001 *
 

@@ -68,7 +68,7 @@ final class WaterwayPath extends OsmPath
 	//if (DEBUG) System.out.println("control draft " +  controlDraft);
 	if (controlDraft == 1) {
 	  boolean canPass = checkHeightValue(rc, wm.boatDraft, wm.key_maxdraft, 0f);
-	  if (!canPass) canPass = checkHeightValue(rc, wm.boatDraft, wm.key_draft, 0f);
+	  if (!canPass) canPass = checkHeightValue(rc, wm.boatDraft, wm.key_ww_draft, 0f);
 	  if (DEBUG) {
 		  System.out.println("draft " +  controlDraft + " open " + wm.key_maxdraft );
 	      System.out.println("can pass " + canPass );
@@ -116,6 +116,7 @@ final class WaterwayPath extends OsmPath
 	  int controlFixedHeight = (int) rc.expctxNode.getVariableValue( "control_bridge_fixed_height", 0 );
 	  int controlOpeningHeight = (int) rc.expctxNode.getVariableValue( "control_bridge_opening_height", 0 );
 	  int controlWidth = (int) rc.expctxNode.getVariableValue( "control_bridge_width", 0 );
+	  int controlDraft = (int) rc.expctxNode.getVariableValue( "control_node_draft", 0 );
 	  if (DEBUG) System.out.println("Bridge fix " +  controlFixedHeight + " open " + controlOpeningHeight);
 	  if (controlOpeningHeight == 1) {
 		  boolean canPass = checkHeightValue(rc, wm.boatHeight, wm.key_clearance_height_closed, 0f);
@@ -130,10 +131,15 @@ final class WaterwayPath extends OsmPath
 		  if (DEBUG) System.out.println("Bridge fixed can pass " + canPass  );
 		  if (canPass) initialcost = 0f;  else initialcost = 10000.f;
 	  }
-	  if (controlWidth == 1 && initialcost == 0f) {
+	  if (controlWidth == 1 && initialcost <= wm.bridgeWaitingTime) {
 		  boolean canPass = checkHeightValue(rc, wm.boatWidth, wm.key_clearance_width, 0f);
 		  if (DEBUG) System.out.println("Bridge width can pass " + canPass  );
-		  if (canPass) initialcost = 0f;  else initialcost = 10000.f;
+		  if (!canPass) initialcost = 10000.f;
+	  }
+	  if (controlDraft == 1 ) {
+		  boolean canPass = checkHeightValue(rc, wm.boatDraft, wm.key_maxdraft, 100f);
+		  if (DEBUG) System.out.println("draft can pass " + canPass  );
+		  if (!canPass) initialcost = 10000.f;
 	  }
 	  
       if ( initialcost >= 1000000. )
