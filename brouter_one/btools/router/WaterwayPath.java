@@ -64,14 +64,19 @@ final class WaterwayPath extends OsmPath
 		extraTime += initialcost;
 	}
 	
-	int controlDraft = (int) rc.expctxNode.getVariableValue( "control_draft", 0 );
+	int controlDraft = (int) rc.expctxWay.getVariableValue( "control_draft", 0 );
+	int controlWidth = (int) rc.expctxNode.getVariableValue( "control_bridge_width", 0 );
 	//if (DEBUG) System.out.println("control draft " +  controlDraft);
+	if (controlWidth == 1 && initialcost <= wm.bridgeWaitingTime) {
+	  boolean canPass = checkHeightValue(rc, wm.boatWidth, wm.key_ww_clearance_width, 0f);
+	  if (DEBUG) 
+		  System.out.println("Bridge way width can pass " + canPass  );
+	  if (!canPass) initialcost = 10000.f;
+	}
 	if (controlDraft == 1) {
-	  boolean canPass = checkHeightValue(rc, wm.boatDraft, wm.key_maxdraft, 0f);
-	  if (!canPass) canPass = checkHeightValue(rc, wm.boatDraft, wm.key_ww_draft, 0f);
+	  boolean canPass = checkHeightValue(rc, wm.boatDraft, wm.keys_ww_depth, 100f, false);
 	  if (DEBUG) {
-		  System.out.println("draft " +  controlDraft + " open " + wm.key_maxdraft );
-	      System.out.println("can pass " + canPass );
+		  System.out.println("draft " +  controlDraft + "can pass " + canPass );
 	  }
 	  if (canPass) initialcost = 0f; else initialcost = 10000f;
 	}
@@ -115,7 +120,7 @@ final class WaterwayPath extends OsmPath
 	  
 	  int controlFixedHeight = (int) rc.expctxNode.getVariableValue( "control_bridge_fixed_height", 0 );
 	  int controlOpeningHeight = (int) rc.expctxNode.getVariableValue( "control_bridge_opening_height", 0 );
-	  int controlWidth = (int) rc.expctxNode.getVariableValue( "control_bridge_width", 0 );
+	  int controlWidth = (int) rc.expctxNode.getVariableValue( "control_node_bridge_width", 0 );
 	  int controlDraft = (int) rc.expctxNode.getVariableValue( "control_node_draft", 0 );
 	  if (DEBUG) System.out.println("Bridge fix " +  controlFixedHeight + " open " + controlOpeningHeight);
 	  if (controlOpeningHeight == 1) {
@@ -133,11 +138,12 @@ final class WaterwayPath extends OsmPath
 	  }
 	  if (controlWidth == 1 && initialcost <= wm.bridgeWaitingTime) {
 		  boolean canPass = checkHeightValue(rc, wm.boatWidth, wm.key_clearance_width, 0f);
-		  if (DEBUG) System.out.println("Bridge width can pass " + canPass  );
+		  if (DEBUG) 
+			  System.out.println("Bridge width can pass " + canPass  );
 		  if (!canPass) initialcost = 10000.f;
 	  }
 	  if (controlDraft == 1 ) {
-		  boolean canPass = checkHeightValue(rc, wm.boatDraft, wm.key_maxdraft, 100f);
+		  boolean canPass = checkHeightValue(rc, wm.boatDraft, wm.keys_depth, 100f, true);
 		  if (DEBUG) System.out.println("draft can pass " + canPass  );
 		  if (!canPass) initialcost = 10000.f;
 	  }
@@ -174,6 +180,31 @@ final class WaterwayPath extends OsmPath
 
 	if (DEBUG) 
 		System.out.println("height " + value + " boat " + boat + " default " + start + " can pass " + (boat < value));
+	if (boat < value) return true;
+	else return false;
+  }
+
+  private boolean checkHeightValue(RoutingContext rc, float boat, int[] keys, float start, boolean bnode) {
+	float value = start;
+	int i = 0;
+	if ( bnode && rc.expctxNode != null ||
+	     rc.expctxWay != null ) {
+		try {
+			for (i = 0; i < keys.length; i++) {
+				if (keys[i] == -1) continue;
+				float tmp = bnode ? 
+							rc.expctxNode.getLookupValue( true, targetNode.nodeDescription, keys[i] ) :
+							rc.expctxWay.getLookupValue( true, link.descriptionBitmap, keys[i] );
+				if (tmp != -1f) { 
+					value = tmp;
+					break;
+				}
+			}
+		} catch(Exception e) {System.out.println("WaterwayPath: keys " + keys[i] + " e:" + e.getMessage()); }
+	}
+
+	if (DEBUG) 
+		System.out.println("start " + (bnode?"Node ":"Way ") + i + " value " + value + " boat " + boat + " default " + start + " can pass " + (boat < value));
 	if (boat < value) return true;
 	else return false;
   }
@@ -217,6 +248,7 @@ final class WaterwayPath extends OsmPath
       return;
     }
 	
+  	WaterwayModel wm = (WaterwayModel)rc.pm;
 
     double wayMaxspeed;
    
@@ -235,10 +267,10 @@ final class WaterwayPath extends OsmPath
 	
     // Calc energy assuming biking (no good model yet for hiking)
     // (Count only positive, negative would mean breaking to enforce maxspeed)
-    double energy = dist; //*(rc.S_C_x*speed*speed + f_roll);
+    double energy = dt * 1000.; //dist; //*(rc.S_C_x*speed*speed + f_roll);
     if ( energy > 0. )
     {
-      totalEnergy += energy;
+      totalEnergy += energy * wm.literHour;
     }
   }
 

@@ -391,19 +391,14 @@ seamark:type;0000000001 lock_basin
 
 
 seamark:type;0000000001 bridge
-seamark:bridge:category;0000000001 fixed
-seamark:bridge:category;0000000001 opening 
-seamark:bridge:category;0000000001 swing 
-seamark:bridge:category;0000000001 lifting 
-seamark:bridge:category;0000000001 bascule 
-seamark:bridge:category;0000000001 pontoon 
-seamark:bridge:category;0000000001 drawbridge 
-seamark:bridge:category;0000000001 transporter 
-seamark:bridge:category;0000000001 footbridge 
-seamark:bridge:category;0000000001 viaduct 
-seamark:bridge:category;0000000001 aqueduct 
-seamark:bridge:category;0000000001 suspension
+seamark:bridge:category;0000000001 fixed viaduct aqueduct suspension footbridge
+seamark:bridge:category;0000000001 opening swing bascule pontoon drawbridge lifting transporter
 
+seamark:bridge:clearance_width;0000000001 *
+
+seamark:type;0000000001 gate
+seamark:gate:clearance_width;0000000001 *
+seamark:gate:clearance_height;0000000001 *
 
 waterway;0000016046 river
 waterway;0000009496 canal
@@ -426,6 +421,8 @@ waterway;0000000001 ditch
 draft;0000000001 *
 maxdraft;0000000001 *
 depth;0000000001 *
+maxdraught;0000000001 *
+
 passage_time;0000000001 *
 
 lock;0000000001 yes               
@@ -914,19 +911,19 @@ railway;0000014285 subway_entrance
 railway;0000010890 signal
 
 seamark:type;0000000001 bridge
-seamark:bridge:category;0000000001 fixed viaduct aqueduct footbridge suspension
-seamark:bridge:category;0000000001 opening swing lifting bascule drawbridge pontoon transporter
+seamark:bridge:category;0000000001 fixed viaduct aqueduct suspension footbridge
+seamark:bridge:category;0000000001 opening swing bascule pontoon drawbridge lifting transporter
 
 seamark:bridge:clearance_height;0000000001 *
 seamark:bridge:clearance_height_safe;0000000001 *
 seamark:bridge:clearance_height_closed;0000000001 *
 seamark:bridge:clearance_height_open;0000000001 *
 
+seamark:bridge:clearance_width;0000000001 *
+
 maxdraft;0000000001 *
 depth;0000000001 *
 water:depth;0000000001 *
-
-seamark:bridge:clearance_width;0000000001 *
 
 seamark:type;0000000001 gate
 seamark:gate:category;0000000001 general
@@ -935,6 +932,9 @@ seamark:gate:category;0000000001 caisson
 seamark:gate:category;0000000001 lock 
 seamark:gate:category;0000000001 dyke
 seamark:gate:category;0000000001 sluice
+
+seamark:gate:clearance_width;0000000001 *
+seamark:gate:clearance_height;0000000001 *
 
 waterway;0000050000 dam
 waterway;0000004698 weir
