@@ -70,11 +70,14 @@ surface;0000004549 grass_paver
 surface;0000004398 clay
 surface;0000003760 metal
 
+disused;0000000001d yes
+
 waterway:maxspeed;0000000001 6
 waterway:maxspeed;0000000001 9
 waterway:maxspeed;0000000001 10
 
 maxspeed;0000000001 none
+maxspeed;0000000001 3 5_knots
 maxspeed;0000000001 4.5
 maxspeed;0000000001 5
 maxspeed;0000000001 6 4_mph
@@ -417,6 +420,7 @@ waterway;0000000001 safe_water
 waterway;0000000001 stream
 waterway;0000000001 narrow
 waterway;0000000001 ditch
+waterway;0000000001 tidal_channel
 
 draft;0000000001 *
 maxdraft;0000000001 *
@@ -452,6 +456,9 @@ CEMT;0000000001 VIa
 CEMT;0000000001 VIb
 CEMT;0000000001 VIc
 CEMT;0000000001 VII
+
+intermittent;0000000801 yes
+intermittent;0000000801 no
 
 route;0000000850 ferry
 route;0000000539 hiking

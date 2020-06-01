@@ -14,36 +14,35 @@ assign literHour    1.5		# %literHour% | liter per hour | number
 assign boat_class   1
 
 # my boat has max speed
-# assign boat_maxspeed 	     10
 assign  maxSpeed             18  # km/h (Caution: this is case sensitive internal parameter and different to maxspeed)
                                  # handle with care, this belongs to your local area and your boat
-assign  speed_with_stream    18  # speed in the direction of flow
-assign  speed_against_stream  8  # against the flow
-assign  speed_normal         13  # no flow
+assign  speed_normal         10  # %speed_normal% | Speed in kmh | number
+assign  flow_rate            0   # %flow_rate% | Flow in kmh | number
 
 # global values
 
-assign   validForBikes            1
+assign   validForBikes            0
 assign   validForCars             0
 assign   validForFoot             0
+assign   validForVessels          1
 
-assign totalMass  = 1000     # unused at the moment xtotalMass% | Mass (in kg) of the bike + biker, for travel time computation | number
-assign bikerPower = 15000    # unused at the moment xbikerPower% | Average power (in W) provided by the biker, for travel time computation | number
+#assign totalMass  = 1000     # unused at the moment xtotalMass% | Mass (in kg) of the bike + biker, for travel time computation | number
+#assign bikerPower = 15000    # unused at the moment xbikerPower% | Average power (in W) provided by the biker, for travel time computation | number
 
 assign   shortest_way             1   # 0 as default
 
 #assign   vmax 		              20
 
 assign   turnInstructionMode      1   # 0=none, 1=auto-choose, 2=locus-style, 3=osmand-style, 4=comment-style, 5=gpsies
-assign   processUnusedTags        1   # lists all (incl. unused) key/value pairs in geojson
+assign   processUnusedTags        0   # lists all (incl. unused) key/value pairs in geojson
 
 assign   cost1speed               20  # kmh
 assign   inverseRouting           1
 assign   showspeed                1   # show speed instead of elevation (geojson)
 
-assign   waiting_lock 			  900    # in seconds for one lock_gate
+assign   waiting_lock 			  900    # in seconds, for one lock_gate
 assign   waiting_bridge			  900    # in seconds
-assign   around_time			  900    # in seconds
+assign   around_time			  900    # in seconds, avoid obstacles
 
 assign   notdefined               10000
 
@@ -109,11 +108,11 @@ assign	use_CEMT
     else 
 	    false
 		
-		
+		  
 assign boat_maxspeed =
-  switch and waterway=river reversedirection=yes speed_against_stream
-  switch and waterway=river reversedirection= speed_with_stream
-  speed_normal
+  if ( and waterway=river reversedirection=yes ) then add speed_normal flow_rate 
+  else if ( and waterway=river reversedirection= ) then sub speed_normal flow_rate
+  else speed_normal
 
 
 assign maxspeed_impl =
