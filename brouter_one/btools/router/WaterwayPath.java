@@ -262,15 +262,16 @@ final class WaterwayPath extends OsmPath
     double speed = wayMaxspeed; // Travel speed
 	
     float dt = (float) ( dist / speed );
-	if (DEBUG)  System.out.println("WaterwayPath: computeKinematic extraTime:" + extraTime);
     totalTime += dt + extraTime;
+	if (DEBUG) 
+		System.out.println("WaterwayPath: computeKinematic " + totalTime + " extraTime:" + extraTime);
 	
     // Calc energy assuming biking (no good model yet for hiking)
     // (Count only positive, negative would mean breaking to enforce maxspeed)
     double energy = dt * 1000.; //dist; //*(rc.S_C_x*speed*speed + f_roll);
     if ( energy > 0. )
     {
-      totalEnergy += energy * wm.literHour;
+      totalEnergy =  totalTime * 1000.f * wm.literHour;
     }
   }
 

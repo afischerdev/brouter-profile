@@ -77,13 +77,12 @@ waterway:maxspeed;0000000001 9
 waterway:maxspeed;0000000001 10
 
 maxspeed;0000000001 none
-maxspeed;0000000001 3 5_knots
 maxspeed;0000000001 4.5
 maxspeed;0000000001 5
 maxspeed;0000000001 6 4_mph
 maxspeed;0000000001 7
 maxspeed;0000000001 8
-maxspeed;0000000001 9
+maxspeed;0000000001 9 5_knots
 maxspeed;0000000001 12
 maxspeed;0000000001 13
 maxspeed;0000000001 13.5
