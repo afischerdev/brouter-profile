@@ -313,7 +313,7 @@ junction;0000002134 jughandle
 junction;0000001493 approach
 junction;0000000100 circular
 
-bridge;0001842517 yes viaduct true suspension
+bridge;0001842517 yes viaduct aqueduct true suspension
 
 tunnel;0000247305 yes
 tunnel;0000016890 building_passage
@@ -393,8 +393,8 @@ seamark:type;0000000001 lock_basin
 
 
 seamark:type;0000000001 bridge
-seamark:bridge:category;0000000001 fixed viaduct aqueduct suspension footbridge
-seamark:bridge:category;0000000001 opening swing bascule pontoon drawbridge lifting transporter
+seamark:bridge:category;0000000001 fixed viaduct suspension footbridge
+seamark:bridge:category;0000000001 opening swing bascule pontoon drawbridge lifting transporter movable
 
 seamark:bridge:clearance_width;0000000001 *
 
@@ -941,6 +941,10 @@ seamark:gate:category;0000000001 sluice
 
 seamark:gate:clearance_width;0000000001 *
 seamark:gate:clearance_height;0000000001 *
+
+seamark:type;0000000001 cable_overhead
+seamark:cable_overhead:clearance_height;0000000001 *
+seamark:cable_overhead:clearance_height_safe;0000000001 *
 
 waterway;0000050000 dam
 waterway;0000004698 weir

@@ -1,7 +1,7 @@
 /**
- * Container for link between two Osm nodes
+ * waterway model
  *
- * @author ab
+ * @author axel
  */
 package btools.router;
 
@@ -37,13 +37,18 @@ final class WaterwayModel extends OsmPathModel
   
   public  int bridgeWaitingTime;
   public  int lockWaitingTime;
+  public  int shortestWay;
 
   public  int key_clearance_height_closed;
   public  int key_clearance_height_open;
   public  int key_clearance_height;
   public  int key_clearance_height_safe;
-  public  int key_vertical_clearance_safe;
   public  int key_clearance_width;
+  public  int key_cable_vertical_clearance_safe;
+  public  int key_cable_clearance_height;
+  
+  public  int key_ww_cable_clearance_height;
+  public  int key_ww_cable_clearance_height_safe;
   public  int key_ww_clearance_width;
   public  int key_ww_draft;
   public  int key_maxdraft;
@@ -58,7 +63,7 @@ final class WaterwayModel extends OsmPathModel
   @Override
   public void init( BExpressionContextWay expctxWay, BExpressionContextNode expctxNode, Map<String,String> keyValues )
   {
-	if (DEBUG) System.out.println("WaterwayModel: init");
+	if (DEBUG) System.out.println("WaterwayModel: init " + keyValues	);
 	
     ctxWay = expctxWay;
     ctxNode = expctxNode;
@@ -75,13 +80,19 @@ final class WaterwayModel extends OsmPathModel
 	
     bridgeWaitingTime = (int) getParam( "waiting_bridge", 0f );
     lockWaitingTime = (int) getParam( "waiting_lock", 0f );
+    shortestWay = (int) getParam( "shortest_way", 0f );
 	
+	// nodes
 	key_clearance_height_closed = expctxNode.getLookupKey("seamark:bridge:clearance_height_closed");
 	key_clearance_height_open = expctxNode.getLookupKey("seamark:bridge:clearance_height_open");
 	key_clearance_height = expctxNode.getLookupKey("seamark:bridge:clearance_height");
 	key_clearance_height_safe = expctxNode.getLookupKey("seamark:bridge:clearance_height_safe");
-	key_vertical_clearance_safe = expctxNode.getLookupKey("seamark:cable_overhead:vertical_clearance_safe");
 	key_clearance_width = expctxNode.getLookupKey("seamark:bridge:clearance_width");
+	key_cable_vertical_clearance_safe = expctxNode.getLookupKey("seamark:cable_overhead:vertical_clearance_safe");
+	key_cable_clearance_height = expctxNode.getLookupKey("seamark:cable_overhead:clearance_height");
+	// waterway
+	key_ww_cable_clearance_height_safe = expctxWay.getLookupKey("seamark:cable_overhead:clearance_height_safe");
+	key_ww_cable_clearance_height = expctxWay.getLookupKey("seamark:cable_overhead:clearance_height");
 	key_ww_clearance_width = expctxWay.getLookupKey("seamark:bridge:clearance_width");
 	key_ww_draft = expctxWay.getLookupKey("draft");
 	key_ww_maxdraft = expctxWay.getLookupKey("maxdraft");
@@ -95,9 +106,12 @@ final class WaterwayModel extends OsmPathModel
 		System.out.println( "key_clearance_height_open " + key_clearance_height_open);
 	    System.out.println( "key_clearance_height " + key_clearance_height);
 	    System.out.println( "key_clearance_height_safe " + key_clearance_height_safe);
-	    System.out.println( "key_vertical_clearance_safe " + key_vertical_clearance_safe);
+	    System.out.println( "key_cable_vertical_clearance_safe " + key_cable_vertical_clearance_safe);
+	    System.out.println( "key_cable_clearance_height " + key_cable_clearance_height);
 	    System.out.println( "key_clearance_width " + key_clearance_width);
 	    System.out.println( "key_ww_clearance_width " + key_ww_clearance_width);
+	    System.out.println( "key_ww_cable_clearance_height_safe " + key_ww_cable_clearance_height_safe);
+	    System.out.println( "key_ww_cable_clearance_height " + key_ww_cable_clearance_height);
 	    System.out.println( "key_ww_draft " + key_ww_draft);
 	    System.out.println( "key_ww_maxdraft " + key_ww_maxdraft);
 	    System.out.println( "key_ww_depth " + key_ww_depth);

@@ -1,7 +1,7 @@
 /**
- * Container for link between two Osm nodes
+ * path rules for waterway
  *
- * @author ab
+ * @author axel
  */
 package btools.router;
 
@@ -11,12 +11,8 @@ final class WaterwayPath extends OsmPath
 {
   final boolean DEBUG = false;
   
-  /**
-   * The elevation-hysteresis-buffer (0-10 m)
-   */
-  private int ehbd; // in micrometer
-  private int ehbu; // in micrometer
-
+  final float DO_NOT_USE = 100000f;
+	
   private float totalTime;  // travel time (seconds)
   private float totalEnergy; // total route energy (Joule)
   private float elevation_buffer; // just another elevation buffer (for travel time)
@@ -30,8 +26,6 @@ final class WaterwayPath extends OsmPath
   public void init( OsmPath orig )
   {
     WaterwayPath origin = (WaterwayPath)orig;
-    this.ehbd = origin.ehbd;
-    this.ehbu = origin.ehbu;
     this.totalTime = origin.totalTime;
     this.totalEnergy = origin.totalEnergy;
     this.elevation_buffer = origin.elevation_buffer;
@@ -40,8 +34,6 @@ final class WaterwayPath extends OsmPath
   @Override
   protected void resetState()
   {
-    ehbd = 0;
-    ehbu = 0;
     totalTime = 0.f;
     totalEnergy = 0.f;
     elevation_buffer = 0.f;
@@ -66,19 +58,27 @@ final class WaterwayPath extends OsmPath
 	
 	int controlDraft = (int) rc.expctxWay.getVariableValue( "control_draft", 0 );
 	int controlWidth = (int) rc.expctxNode.getVariableValue( "control_bridge_width", 0 );
+	int controlCable = (int) rc.expctxNode.getVariableValue( "control_cable_height", 0 );
 	//if (DEBUG) System.out.println("control draft " +  controlDraft);
 	if (controlWidth == 1 && initialcost <= wm.bridgeWaitingTime) {
-	  boolean canPass = checkHeightValue(rc, wm.boatWidth, wm.key_ww_clearance_width, 0f);
+	  boolean canPass = checkValue(rc, wm.boatWidth, wm.key_ww_clearance_width, 0f);
 	  if (DEBUG) 
 		  System.out.println("Bridge way width can pass " + canPass  );
-	  if (!canPass) initialcost = 10000.f;
+	  if (!canPass) initialcost = DO_NOT_USE;
 	}
 	if (controlDraft == 1) {
-	  boolean canPass = checkHeightValue(rc, wm.boatDraft, wm.keys_ww_depth, 100f, false);
+	  boolean canPass = checkValues(rc, wm.boatDraft, wm.keys_ww_depth, 100f, false);
 	  if (DEBUG) {
 		  System.out.println("draft " +  controlDraft + "can pass " + canPass );
 	  }
-	  if (canPass) initialcost = 0f; else initialcost = 10000f;
+	  if (canPass) initialcost = 0f; else initialcost = DO_NOT_USE;
+	}
+	if (controlCable == 1 ) {
+	  boolean canPass = checkValue(rc, wm.boatHeight, wm.key_ww_cable_clearance_height, 100f);
+	  if (canPass) canPass = checkValue(rc, wm.boatHeight, wm.key_ww_cable_clearance_height_safe, 100f);
+	  if (DEBUG) 
+		  System.out.println("cable way can pass " + canPass  );
+	  if (!canPass) initialcost = DO_NOT_USE;
 	}
 
     // penalty for turning angle
@@ -122,33 +122,40 @@ final class WaterwayPath extends OsmPath
 	  int controlOpeningHeight = (int) rc.expctxNode.getVariableValue( "control_bridge_opening_height", 0 );
 	  int controlWidth = (int) rc.expctxNode.getVariableValue( "control_node_bridge_width", 0 );
 	  int controlDraft = (int) rc.expctxNode.getVariableValue( "control_node_draft", 0 );
+	  int controlCable = (int) rc.expctxNode.getVariableValue( "control_node_cable_height", 0 );
 	  if (DEBUG) System.out.println("Bridge fix " +  controlFixedHeight + " open " + controlOpeningHeight);
 	  if (controlOpeningHeight == 1) {
-		  boolean canPass = checkHeightValue(rc, wm.boatHeight, wm.key_clearance_height_closed, 0f);
+		  boolean canPass = checkValue(rc, wm.boatHeight, wm.key_clearance_height_closed, 0f);
 		  if (DEBUG) System.out.println("Bridge open can pass " + canPass  );
 		  if (canPass) initialcost = 0f; else initialcost = wm.bridgeWaitingTime;
-		  canPass = checkHeightValue(rc, wm.boatHeight, wm.key_clearance_height_open, 100f);
-		  if (!canPass) initialcost = 10000f;
+		  canPass = checkValue(rc, wm.boatHeight, wm.key_clearance_height_open, 100f);
+		  if (!canPass) initialcost = DO_NOT_USE;
 	  }
 	  if (controlFixedHeight == 1 ) {
-		  boolean canPass = checkHeightValue(rc, wm.boatHeight, wm.key_clearance_height_safe, 0f);
-		  if (!canPass) canPass = checkHeightValue(rc, wm.boatHeight, wm.key_clearance_height, 0f);
+		  boolean canPass = checkValue(rc, wm.boatHeight, wm.key_clearance_height_safe, 0f);
+		  if (!canPass) canPass = checkValue(rc, wm.boatHeight, wm.key_clearance_height, 0f);
 		  if (DEBUG) System.out.println("Bridge fixed can pass " + canPass  );
-		  if (canPass) initialcost = 0f;  else initialcost = 10000.f;
+		  if (canPass) initialcost = 0f;  else initialcost = DO_NOT_USE;
 	  }
 	  if (controlWidth == 1 && initialcost <= wm.bridgeWaitingTime) {
-		  boolean canPass = checkHeightValue(rc, wm.boatWidth, wm.key_clearance_width, 0f);
+		  boolean canPass = checkValue(rc, wm.boatWidth, wm.key_clearance_width, 0f);
 		  if (DEBUG) 
 			  System.out.println("Bridge width can pass " + canPass  );
-		  if (!canPass) initialcost = 10000.f;
+		  if (!canPass) initialcost = DO_NOT_USE;
 	  }
 	  if (controlDraft == 1 ) {
-		  boolean canPass = checkHeightValue(rc, wm.boatDraft, wm.keys_depth, 100f, true);
+		  boolean canPass = checkValues(rc, wm.boatDraft, wm.keys_depth, 100f, true);
 		  if (DEBUG) System.out.println("draft can pass " + canPass  );
-		  if (!canPass) initialcost = 10000.f;
+		  if (!canPass) initialcost = DO_NOT_USE;
+	  }
+	  if (controlCable == 1 ) {
+		  boolean canPass = checkValue(rc, wm.boatHeight, wm.key_cable_clearance_height, 100f);
+		  if (DEBUG) 
+			  System.out.println("cable can pass " + canPass  );
+		  if (!canPass) initialcost = DO_NOT_USE;
 	  }
 	  
-      if ( initialcost >= 1000000. )
+      if ( initialcost >= DO_NOT_USE )
       {
         return -1.;
       }
@@ -163,13 +170,13 @@ final class WaterwayPath extends OsmPath
 		extraTime = initialcost;
 		totalTime += initialcost;
 	  }
-      return initialcost;
+      return (wm.shortestWay == 0 || initialcost >= DO_NOT_USE )? initialcost :  0d;
     }
 	if (DEBUG)  System.out.println("WaterwayPath: processTargetNode initialcost:0");
     return 0.;
   }
   
-  private boolean checkHeightValue(RoutingContext rc, float boat, int key, float start) {
+  private boolean checkValue(RoutingContext rc, float boat, int key, float start) {
 	float value = start;
 	if (rc.expctxNode != null) {
 		try {
@@ -184,7 +191,7 @@ final class WaterwayPath extends OsmPath
 	else return false;
   }
 
-  private boolean checkHeightValue(RoutingContext rc, float boat, int[] keys, float start, boolean bnode) {
+  private boolean checkValues(RoutingContext rc, float boat, int[] keys, float start, boolean bnode) {
 	float value = start;
 	int i = 0;
 	if ( bnode && rc.expctxNode != null ||
@@ -213,29 +220,15 @@ final class WaterwayPath extends OsmPath
   public int elevationCorrection( RoutingContext rc )
   {
 	if (DEBUG)  System.out.println("WaterwayPath: elevationCorrection");
-    return ( rc.downhillcostdiv > 0 ? ehbd/rc.downhillcostdiv : 0 )
-         + ( rc.uphillcostdiv > 0 ? ehbu/rc.uphillcostdiv : 0 );
+    return 0;
   }
 
   @Override
   public boolean definitlyWorseThan( OsmPath path, RoutingContext rc )
   {
 	if (DEBUG)  System.out.println("WaterwayPath: definitlyWorseThan");
-    WaterwayPath p = (WaterwayPath)path;
 
-	  int c = p.cost;
-	  if ( rc.downhillcostdiv > 0 )
-	  {
-	    int delta = p.ehbd - ehbd;
-	    if ( delta > 0 ) c += delta/rc.downhillcostdiv;
-	  }
-	  if ( rc.uphillcostdiv > 0 )
-	  {
-	    int delta = p.ehbu - ehbu;
-	    if ( delta > 0 ) c += delta/rc.uphillcostdiv;
-	  }
-
-	  return cost > c;
+	  return false;
   }
 
 

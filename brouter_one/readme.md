@@ -12,8 +12,9 @@ Rules
 
 * control draft on CEMT=0 or other waterway
 * control bridge height, width
+* control cable height on nodes
 * control own boat and CEMT
-* define max speed
+* define max speed and flow
 * define explicit speed limit
 * define implicit speed limit
 * define waiting time for locks, bridges, others 

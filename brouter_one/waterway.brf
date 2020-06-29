@@ -8,7 +8,7 @@ assign boat_height	1.5     # %boat_height% | Boat height in Meter | number
 assign boat_width	2.2     # %boat_width% | Boat width in Meter | number
 assign boat_length	10.0	# Boat height in Meter | (not used now)
 assign boat_draft	1.2		# %boat_draft% | Boat draft in Meter | number
-assign literHour    1.5		# %literHour% | liter per hour | number
+assign literHour    1.0		# %literHour% | liter per hour | number
 
 # my boat is CEMT class (decimal)
 assign boat_class   1
@@ -29,12 +29,14 @@ assign   validForVessels          1
 #assign totalMass  = 1000     # unused at the moment xtotalMass% | Mass (in kg) of the bike + biker, for travel time computation | number
 #assign bikerPower = 15000    # unused at the moment xbikerPower% | Average power (in W) provided by the biker, for travel time computation | number
 
-assign   shortest_way             1   # 0 as default
+assign   shortest_way             0   # %shortest_way% | find the direct way | boolean
 
-#assign   vmax 		              20
+assign   useCEMTonly              0   # %useCEMTonly% | use only CEMT, exclude unmarked like canal, fairway | boolean
 
-assign   turnInstructionMode      1   # 0=none, 1=auto-choose, 2=locus-style, 3=osmand-style, 4=comment-style, 5=gpsies
-assign   processUnusedTags        0   # lists all (incl. unused) key/value pairs in geojson
+#assign  vmax 		              20
+
+assign   turnInstructionMode      1   # 0=none, 1=auto-choose, 2=locus-style, 3=osmand-style, 4=comment-style, 5=gpsies, 6=orux-style
+assign   processUnusedTags        1   # lists all (incl. unused) key/value pairs in geojson
 
 assign   cost1speed               20  # kmh
 assign   inverseRouting           1
@@ -58,10 +60,10 @@ assign can_use_CEMT               true
 ---context:way   # following code refers to way-tags
 
 assign control_draft
-#	switch  and CEMT=0 not maxdraft=          true 
+	switch  and CEMT=0 not maxdraft=          true 
 	switch  and CEMT=0 not draft=             true 
-#	switch  and CEMT=0 not depth=             true
-#	switch  and CEMT=0 not maxdraught=        true
+	switch  and CEMT=0 not depth=             true
+	switch  and CEMT=0 not maxdraught=        true
 #    switch and not waterway= not maxdraft=   true 
 #    switch and not waterway= not draft=      true 
 #    switch and not waterway= not depth=      true 
@@ -71,7 +73,13 @@ assign control_draft
 assign control_bridge_width
     if not seamark:bridge:clearance_width= then true
 	else false
-	
+
+# no chance to get crossing points use node, see below	
+#assign control_cable_height
+#    if not seamark:cable_overhead:clearance_height= then true
+#	else if not seamark:cable_overhead:clearance_height_safe= then true
+#	else false
+
 assign pass_lock 
 	if seamark:type=lock_basin then (
 		true
@@ -164,17 +172,20 @@ assign costfactor
     )
     else (
         if      waterway=               then 10000
-        else if seamark:type=fairway    then 1
-		else if waterway=canal 			then 1
-		else if waterway=river 			then 1
-		else if waterway=safe_water		then 1
-	  	else if waterway=fairway        then 1
-	  	else if waterway=narrow         then 1
-		else if seamark:type=recommended_track	then 1
-		else if motorboat=yes           then 1
-		else if ship=yes                then 1
-	  	else   
-    		15000
+        else if not useCEMTonly then 
+			if seamark:type=fairway    then 1
+			else if waterway=canal 			then 1
+			else if waterway=river 			then 1
+			else if waterway=safe_water		then 1
+			else if waterway=fairway        then 1
+			else if waterway=narrow         then 1
+			else if seamark:type=recommended_track	then 1
+			else if motorboat=yes           then 1
+			else if ship=yes                then 1
+			else   
+				15000
+		else
+			15000	
     )
 
 
@@ -196,6 +207,10 @@ assign control_bridge_opening_height
 
 assign control_node_bridge_width
     if not seamark:bridge:clearance_width= then true
+	else false
+	
+assign control_node_cable_height
+    if not seamark:cable_overhead:clearance_height= then true
 	else false
 	
 assign initialcost 
