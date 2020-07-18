@@ -421,10 +421,13 @@ waterway;0000000001 narrow
 waterway;0000000001 ditch
 waterway;0000000001 tidal_channel
 
+depth;0000000001 *
+mindepth;0000000001 *
 draft;0000000001 *
 maxdraft;0000000001 *
-depth;0000000001 *
 maxdraught;0000000001 *
+waterway:mindepth;0000000001 *
+seamark:fairway:minimum_depth;0000000001 *
 
 passage_time;0000000001 *
 
@@ -930,6 +933,7 @@ seamark:bridge:clearance_width;0000000001 *
 maxdraft;0000000001 *
 depth;0000000001 *
 water:depth;0000000001 *
+waterway:mindepth;0000000001 *
 
 seamark:type;0000000001 gate
 seamark:gate:category;0000000001 general

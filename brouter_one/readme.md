@@ -7,6 +7,16 @@ Please see [BRouter feature request ](https://github.com/abrensch/brouter/issues
 like:
 
 seamark:bridge:clearance_height;0000000001 *
+depth;0000000001 *
+
+The problem of all is this is not visible inside the BRouter rules file.
+So I worked around with a control command like this:
+
+assign control_depth
+	switch not depth= true 
+	false
+
+The final control is done in a WaterwayModel/WaterwayPath class
 
 Rules
 

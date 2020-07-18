@@ -60,10 +60,13 @@ assign can_use_CEMT               true
 ---context:way   # following code refers to way-tags
 
 assign control_draft
-	switch  and CEMT=0 not maxdraft=          true 
-	switch  and CEMT=0 not draft=             true 
-	switch  and CEMT=0 not depth=             true
-	switch  and CEMT=0 not maxdraught=        true
+	switch  and CEMT=0 not maxdraft=                       true 
+	switch  and CEMT=0 not draft=                          true 
+	switch  and CEMT=0 not depth=                          true
+	switch  and CEMT=0 not maxdraught=                     true
+	switch  and CEMT=0 not mindepth=                       true
+	switch  and CEMT=0 not waterway:mindepth=              true
+	switch  and CEMT=0 not seamark:fairway:minimum_depth=  true
 #    switch and not waterway= not maxdraft=   true 
 #    switch and not waterway= not draft=      true 
 #    switch and not waterway= not depth=      true 
@@ -192,9 +195,10 @@ assign costfactor
 ---context:node  # following code refers to node tags
 
 assign control_node_draft
-	switch not maxdraft=    true
-	switch not depth=       true
-	switch not water:depth= true
+	switch not depth=             true
+	switch not maxdraft=          true
+	switch not water:depth=       true
+	switch not waterway:mindepth= true
 	false
 
 assign control_bridge_fixed_height

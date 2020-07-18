@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.StringTokenizer;
 import java.util.TreeMap;
+import java.util.Locale;
 
 import btools.util.BitCoderContext;
 import btools.util.Crc32;
@@ -636,13 +637,14 @@ public abstract class BExpressionContext implements IByteArrayUnifier
  	    if (bFoundAsterix) {
 		  // found value for lookup *
 		  //System.out.println( "add unknown " + name + "  " + value );	
+		  String org = value;
 		  try {
 			value = value.replace(",", ".");
-			if (value.contains("ft")) {
+			if (value.toLowerCase().contains("ft")) {
 				value = value.replace("_", "");
 				float foot = 0f;
 				int inch = 0;
-				String[] sa = value.trim().split("ft");
+				String[] sa = value.toLowerCase().trim().split("ft");
 				if (sa.length >= 1) foot = Float.parseFloat(sa[0].trim());
 				if (sa.length == 2) {
 					value = sa[1];
@@ -650,15 +652,32 @@ public abstract class BExpressionContext implements IByteArrayUnifier
 					inch = Integer.parseInt(value.trim());
 					foot += inch/12f;
 				}
-				value = Float.toString(foot*0.3048f);
+				value = String.format(Locale.US, "%3.1f", foot*0.3048f);
 			}	  
 			else if (value.contains("in")) {
 				value = value.replace("_", "");
 				float inch = 0f;
 				if (value.indexOf("in") > 0) value = value.substring(0,value.indexOf("in"));
 				inch = Float.parseFloat(value.trim());
-				value = Float.toString(inch*0.0254f);
+				value = String.format(Locale.US, "%3.1f",inch*0.0254f);
 			}
+			else if (value.toLowerCase().contains("feet")) {
+				value = value.replace("_", "");
+				String s = value.substring(0, value.toLowerCase().indexOf("f") );
+				value = s.trim();
+			}	  
+			else if (value.contains("cm")) {
+				value = value.replace("_", "");
+				String[] sa = value.trim().split("cm");
+				if (sa.length == 1) value = sa[0].trim();
+				float cm = Float.parseFloat(value.trim());
+				value = String.format(Locale.US, "%3.1f", cm*100f);
+			}	  
+			else if (value.toLowerCase().contains("meter")) {
+				value = value.replace("_", "");
+				String s = value.substring(0, value.toLowerCase().indexOf("m") );
+				value = s.trim();
+			}	  
 			else if (value.contains("m")) {
 				value = value.replace("_", "");
 				String[] sa = value.trim().split("m");
@@ -668,7 +687,7 @@ public abstract class BExpressionContext implements IByteArrayUnifier
 			// found negative maxdraft values
 		    lookupData2[inum] = 1000 + (int)(Math.abs(Float.parseFloat(value))*100f);		  
 		  } catch ( Exception e) {
-			System.out.println( "error for " + name + "  " + value + " " + e.getMessage());	
+			System.out.println( "error for " + name + "  " + org + " trans " + value + " " + e.getMessage());	
 			lookupData2[inum] = 1;
 		  }
 	    } 

@@ -73,6 +73,7 @@ final class WaterwayPath extends OsmPath
 	  }
 	  if (canPass) initialcost = 0f; else initialcost = DO_NOT_USE;
 	}
+	/* not reachable
 	if (controlCable == 1 ) {
 	  boolean canPass = checkValue(rc, wm.boatHeight, wm.key_ww_cable_clearance_height, 100f);
 	  if (canPass) canPass = checkValue(rc, wm.boatHeight, wm.key_ww_cable_clearance_height_safe, 100f);
@@ -80,7 +81,7 @@ final class WaterwayPath extends OsmPath
 		  System.out.println("cable way can pass " + canPass  );
 	  if (!canPass) initialcost = DO_NOT_USE;
 	}
-
+    */
     // penalty for turning angle
     int turncost = (int)((1.-cosangle) * turncostbase + 0.2 ); // e.g. turncost=90 -> 90 degree = 90m penalty
     if ( message != null )
@@ -150,6 +151,7 @@ final class WaterwayPath extends OsmPath
 	  }
 	  if (controlCable == 1 ) {
 		  boolean canPass = checkValue(rc, wm.boatHeight, wm.key_cable_clearance_height, 100f);
+	      if (canPass) canPass = checkValue(rc, wm.boatHeight, wm.key_cable_clearance_height_safe, 100f);
 		  if (DEBUG) 
 			  System.out.println("cable can pass " + canPass  );
 		  if (!canPass) initialcost = DO_NOT_USE;
