@@ -6,21 +6,44 @@ Please see [BRouter feature request ](https://github.com/abrensch/brouter/issues
 
 like:
 
-seamark:bridge:clearance_height;0000000001 *
+--- lookups.dat
+seamark:bridge:clearance_height_closed;0000000001 *
 depth;0000000001 *
 
-The problem of all is this is not visible inside the BRouter rules file.
-So I worked around with a control command like this:
+This definition save the values behind the variables into the BRouter segment files as a positive integer.
+To have floating values the stored integer is build by value * 100.
+The parsing und converting is only done for meter and feet at the moment.
 
-assign control_depth
-	switch not depth= true 
-	false
+To use the values later on in the profile they are marked as variable 'v:'
+   e.g. v:seamark:bridge:clearance_height_closed
+   
+It can be only compared with the lesser, greater, equal logic
 
-The final control is done in a WaterwayModel/WaterwayPath class
+use like:
+
+--- waterway.brf
+assign boat_height	1.5  
+
+assign waiting_height 
+	if seamark:bridge:category=opening then 
+	  switch  and not      seamark:bridge:clearance_height_closed=
+	              lesser v:seamark:bridge:clearance_height_closed boat_height true 
+	  false
+	else false
+
+assign initialcost 
+	switch waiting_height      900
+	0
+
+This shows also a problem on using this variables.
+The variable has to be controlled if they comes with a value. Otherwise if delivers -1 as result and can produce wrong results.
+The WaterwayModel/WaterwayPath class are helper classes and can be used to collect e.g. litre per hour.
+
+Changes on the original for RoutingContext, BExpression and BExpressionContext
 
 Rules
 
-* control draft on CEMT=0 or other waterway
+* control draft CEMT or other waterway
 * control bridge height, width
 * control cable height on nodes
 * control own boat and CEMT

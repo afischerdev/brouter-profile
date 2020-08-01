@@ -166,22 +166,10 @@ public abstract class BExpressionContext implements IByteArrayUnifier
     byte[] ab = new byte[len];
     System.arraycopy( abBuf, 0, ab, 0, len );
 
-/*
-	String out = "";
-    for (int i = 0; i< ld.length; i++) {
-		out += ld[i] + " ";
-	}
-	System.out.println( "ld: " + out );
-*/
+
     // crosscheck: decode and compare
     int[] ld2 = new int[lookupValues.size()];
     decode( ld2, false, ab );
-/*	out = "";
-    for (int i = 0; i< ld2.length; i++) {
-		out += ld2[i] + " ";
-	}
-	System.out.println( "ld2: " + out );
-*/	
     for( int inum = 1; inum < lookupValues.size(); inum++ ) // loop over lookup names (except reverse dir)
     {
       if ( ld2[inum] != ld[inum] ) throw new RuntimeException( "assertion failed encoding inum=" + inum + " val=" + ld[inum] + " " + getKeyValueDescription(false, ab) );
@@ -240,12 +228,6 @@ public abstract class BExpressionContext implements IByteArrayUnifier
     for( int inum = 0; inum < lookupValues.size(); inum++ ) // loop over lookup names
     {
       BExpressionLookupValue[] va = lookupValues.get(inum);
-	  if (1==0 && lookupData[inum] > 0 && lookupNames.get( inum ).startsWith("seamark:bridge:")) {
-		  for (int i = 0; i < va.length; i++) {
-			  System.out.print(" value " + va[i] );
-		  }
-		System.out.println(" values " + inum + " "  + va.length + " " + lookupData[inum] + " " + lookupNames.get( inum ));
-		}
 	  int val = lookupData[inum];
       String value = (val>=1000) ? Float.toString((val-1000)/100f) : va[val].toString();
       if ( value != null && value.length() > 0 )
@@ -281,6 +263,14 @@ public abstract class BExpressionContext implements IByteArrayUnifier
       res = lookupNumbers.get(name).intValue();
 	} catch (Exception e ) {}
 	return res;
+  }
+  
+  public float getLookupValue(int key) {
+	float res = 0f;
+    int val = lookupData[key];
+	if (val == 0) return -1f;
+	res = (val-1000)/100f;
+    return 	res;
   }
   
   public float getLookupValue(boolean inverseDirection, byte[] ab, int key) {
@@ -571,7 +561,7 @@ public abstract class BExpressionContext implements IByteArrayUnifier
     }
   }
 
-  private String variableName( int idx )
+  public String variableName( int idx )
   {
     for( Map.Entry<String,Integer> e : variableNumbers.entrySet() )
     {
@@ -714,11 +704,6 @@ public abstract class BExpressionContext implements IByteArrayUnifier
 		  values[i] = newValue;
 		  lookupHistograms.set(inum, histo);
 		  lookupValues.set(inum, values);
-	  
-    }
-	if (bFoundAsterix) {
-	  // found value for lookup *
-	  // System.out.println( "found " + name + "  " + value );		  
 	} 
 
     histo[i]++;
@@ -854,7 +839,7 @@ public abstract class BExpressionContext implements IByteArrayUnifier
       minWriteIdx = variableData == null ? 0 : variableData.length;
 
       expressionList = _parseFile( file );
-
+	  
       // determine the build-in variable indices
       String[] varNames = getBuildInVariableNames();
       nBuildInVars = varNames.length;
@@ -863,6 +848,7 @@ public abstract class BExpressionContext implements IByteArrayUnifier
       {
         buildInVariableIdx[vi] = getVariableIdx( varNames[vi], false );
       }
+
 
       float[] readOnlyData = variableData;
       variableData = new float[variableNumbers.size()];
@@ -875,7 +861,7 @@ public abstract class BExpressionContext implements IByteArrayUnifier
     {
       if ( e instanceof IllegalArgumentException )
       {
-        throw new IllegalArgumentException( "ParseException at line " + linenr + ": " + e.getMessage() );
+        throw new IllegalArgumentException( "ParseException " + file + " at line " + linenr + ": " + e.getMessage() );
       }
       throw new RuntimeException( e );
     }
@@ -902,6 +888,21 @@ public abstract class BExpressionContext implements IByteArrayUnifier
     return result;
   }
 
+  public void setVariableValue(String name, float value, boolean create ) {
+    Integer num = variableNumbers.get( name );
+    if ( num == null )
+    {
+      if ( create )
+      {
+        num = new Integer( variableNumbers.size() );
+        variableNumbers.put( name, num );
+      }
+    } else {
+	  variableData[num.intValue()] = value;
+	  System.out.println("setVariableValue: " + name + " "  + num + " = " + value);
+	}
+  }
+	  
 
   public float getVariableValue( String name, float defaultValue )
   {

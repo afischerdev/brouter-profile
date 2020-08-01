@@ -433,11 +433,15 @@ passage_time;0000000001 *
 
 lock;0000000001 yes               
 
-boat;0000019888 no private
-boat;0000002718 yes permissive
-
-motorboat;0000001077 yes
-motorboat;0000000808 no private privat
+boat;0000000001 no
+boat;0000000001 yes
+boat;0000000001 private
+boat;0000000001 permissive
+boat;0000000001 designated
+ 
+motorboat;0000000001 yes
+motorboat;0000000001 no
+motorboat;0000000001 private privat
  
 ship;0000001077 yes
 ship;0000000808 no
@@ -495,6 +499,9 @@ ncn;0000001036 proposed
 
 ford;0000020552 yes
 ford;0000000289 stepping_stones
+ford;0000000289 stream
+ford;0000000289 boat
+
 
 trail_visibility;0000067438 good
 trail_visibility;0000041280 intermediate
@@ -946,9 +953,14 @@ seamark:gate:category;0000000001 sluice
 seamark:gate:clearance_width;0000000001 *
 seamark:gate:clearance_height;0000000001 *
 
+width;0000000001 *
+
 seamark:type;0000000001 cable_overhead
 seamark:cable_overhead:clearance_height;0000000001 *
 seamark:cable_overhead:clearance_height_safe;0000000001 *
+
+seamark:type;0000000001 distance_mark
+seamark:type;0000000001 gate
 
 waterway;0000050000 dam
 waterway;0000004698 weir
@@ -959,6 +971,8 @@ waterway;0000000332 take_left_side
 waterway;0000000219 milestone
 waterway;0000000187 depth
 waterway;0000000170 lock
+waterway;0000000001 narrow
+waterway;0000000001 drawbridge
 
 noexit;0000195286 yes
 

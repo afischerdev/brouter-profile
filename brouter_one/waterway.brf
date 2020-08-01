@@ -1,8 +1,6 @@
 ---model:btools.router.WaterwayModel
 ---context:global   # following code refers to global config
 
-# user values
-
 # my boat in meter
 assign boat_height	1.5     # %boat_height% | Boat height in Meter | number
 assign boat_width	2.2     # %boat_width% | Boat width in Meter | number
@@ -10,30 +8,15 @@ assign boat_length	10.0	# Boat height in Meter | (not used now)
 assign boat_draft	1.2		# %boat_draft% | Boat draft in Meter | number
 assign literHour    1.0		# %literHour% | liter per hour | number
 
-# my boat is CEMT class (decimal)
-assign boat_class   1
-
 # my boat has max speed
 assign  maxSpeed             18  # km/h (Caution: this is case sensitive internal parameter and different to maxspeed)
                                  # handle with care, this belongs to your local area and your boat
 assign  speed_normal         10  # %speed_normal% | Speed in kmh | number
 assign  flow_rate            0   # %flow_rate% | Flow in kmh | number
 
-# global values
-
-assign   validForBikes            0
-assign   validForCars             0
-assign   validForFoot             0
-assign   validForVessels          1
-
-#assign totalMass  = 1000     # unused at the moment xtotalMass% | Mass (in kg) of the bike + biker, for travel time computation | number
-#assign bikerPower = 15000    # unused at the moment xbikerPower% | Average power (in W) provided by the biker, for travel time computation | number
-
 assign   shortest_way             0   # %shortest_way% | find the direct way | boolean
 
 assign   useCEMTonly              0   # %useCEMTonly% | use only CEMT, exclude unmarked like canal, fairway | boolean
-
-#assign  vmax 		              20
 
 assign   turnInstructionMode      1   # 0=none, 1=auto-choose, 2=locus-style, 3=osmand-style, 4=comment-style, 5=gpsies, 6=orux-style
 assign   processUnusedTags        1   # lists all (incl. unused) key/value pairs in geojson
@@ -46,80 +29,48 @@ assign   waiting_lock 			  900    # in seconds, for one lock_gate
 assign   waiting_bridge			  900    # in seconds
 assign   around_time			  900    # in seconds, avoid obstacles
 
-assign   notdefined               10000
-
-
-# https://wiki.openstreetmap.org/wiki/Key:CEMT
-# https://wiki.openstreetmap.org/wiki/Inland_navigation
-
-# CEMT is available in this region
-assign can_use_CEMT               true
-
-
+assign   notdefined               100000
 
 ---context:way   # following code refers to way-tags
 
-assign control_draft
-	switch  and CEMT=0 not maxdraft=                       true 
-	switch  and CEMT=0 not draft=                          true 
-	switch  and CEMT=0 not depth=                          true
-	switch  and CEMT=0 not maxdraught=                     true
-	switch  and CEMT=0 not mindepth=                       true
-	switch  and CEMT=0 not waterway:mindepth=              true
-	switch  and CEMT=0 not seamark:fairway:minimum_depth=  true
-#    switch and not waterway= not maxdraft=   true 
-#    switch and not waterway= not draft=      true 
-#    switch and not waterway= not depth=      true 
-#    switch and not waterway= not maxdraught= true 
+assign turncost 0
+assign initialcost 0
+
+assign no_depth 
+	switch  and not      depth=
+	            lesser v:depth boat_draft                          true
+	switch  and not      maxdraft=
+	            lesser v:maxdraft boat_draft                       true
+	switch  and not      draft=
+	            lesser v:draft boat_draft                          true
+	switch  and not      maxdraught=
+	            lesser v:maxdraught boat_draft                     true
+	switch  and not      mindepth=
+	            lesser v:mindepth boat_draft                       true
+	switch  and not      waterway:mindepth=
+	            lesser v:waterway:mindepth boat_draft              true
+	switch  and not      seamark:fairway:minimum_depth=
+	            lesser v:seamark:fairway:minimum_depth boat_draft  true
 	false
 
-assign control_bridge_width
-    if not seamark:bridge:clearance_width= then true
-	else false
+assign no_width 
+    switch and not      seamark:bridge:clearance_width=
+	           lesser v:seamark:bridge:clearance_width boat_width true
+    switch and not      seamark:gate:clearance_width=
+	           lesser v:seamark:gate:clearance_width boat_width true
+    false
 
-# no chance to get crossing points use node, see below	
-#assign control_cable_height
-#    if not seamark:cable_overhead:clearance_height= then true
-#	else if not seamark:cable_overhead:clearance_height_safe= then true
-#	else false
-
-assign pass_lock 
-	if seamark:type=lock_basin then (
-		true
-		)
-	else false
-
-assign this_class                       # len       width 	draught 	height
-    if      CEMT=0       then 1         # used in NL for recreational boating fairways 
-    else if CEMT=I       then 2         # 38,50 	5,05 	1,8-2,2 	4
-    else if CEMT=II      then 3         # 50-55 	6,6 	2,5 	    4-5
-    else if CEMT=III     then 4         # 67-80 	8,2 	2,5 	    4-5
-    else if CEMT=IV      then 5         # 80-85 	9,5 	2,5 	    5,25-7
-    else if CEMT=V       then 6         # 95-110 	11,4 	2,5-4,5 	5,25-7
-    else if CEMT=Va      then 6         # 95-110 	11,4 	2,5-4,5 	5,25-7
-    else if CEMT=Vb      then 7         # 172-185 	11,4 	2,5-4,5 	5,25-9,1
-    else if CEMT=VI      then 8         # 95-110 	22,8 	2,5-4,5 	7-9,1
-    else if CEMT=VIa     then 8         # 95-110 	22,8 	2,5-4,5 	7-9,1
-    else if CEMT=VIb     then 9         # 185-195 	22,8 	2,5-4,5 	7-9,1
-    else if CEMT=VIc     then 10        # 193-200 	34,2 	2,5-4,5 	9,1
-    else if CEMT=VII     then 11        # 195/285 	34,2 	2,5-4,5 	9,1
-    else
-        0
-	
 assign	use_CEMT 
     if not CEMT= then (
-        # if motorboat=no then false
-        # else if greater this_class boat_class then true
-        # else
 		switch motorboat=no false
-		switch ship=no false
+		switch ship=no      false
 		switch CEMT=0|I|II|III|IV|V|Va|Vb|VI|VIa|VIb|VIc|VII true	# make sure to drop classes you can't use
         false
     )
     else 
 	    false
-		
-		  
+
+
 assign boat_maxspeed =
   if ( and waterway=river reversedirection=yes ) then add speed_normal flow_rate 
   else if ( and waterway=river reversedirection= ) then sub speed_normal flow_rate
@@ -127,9 +78,9 @@ assign boat_maxspeed =
 
 
 assign maxspeed_impl =
-  switch CEMT=0                     10 # 6
+  switch CEMT=0                     6
   switch CEMT=I|II|III|IV           10
-  switch CEMT=V|Va|Vb               10 # 12
+  switch CEMT=V|Va|Vb               12
   switch CEMT=VI|VIa|VIb|VIc|VII    15
   20
   
@@ -157,68 +108,88 @@ assign maxspeed_defined
 assign maxspeed =
   min maxspeed_defined boat_maxspeed
 
-assign turncost 0
-
-
-assign initialcost 
-    if waterway=weir                then around_time
-    else if waterway=dam            then around_time
-    else if waterway=fish_pass      then around_time
-    else
-    0
-
-
-
 assign costfactor
-    if  use_CEMT then (
+	if  and use_CEMT 
+	    or  not no_depth
+            not no_width then (
       	1
     )
     else (
-        if      waterway=               then 10000
+        if      waterway=                   then notdefined
         else if not useCEMTonly then 
-			if seamark:type=fairway    then 1
-			else if waterway=canal 			then 1
-			else if waterway=river 			then 1
-			else if waterway=safe_water		then 1
-			else if waterway=fairway        then 1
-			else if waterway=narrow         then 1
-			else if seamark:type=recommended_track	then 1
-			else if motorboat=yes           then 1
-			else if ship=yes                then 1
-			else   
-				15000
+			switch and 
+			       waterway=canal|river|fairway|safe_water 
+                   or no_depth no_width				           notdefined
+            switch waterway=canal|river|fairway|safe_water     1
+			switch and  seamark:type=fairway|recommended_track 
+                   or no_depth no_width				           notdefined
+			switch seamark:type=fairway|recommended_track      1 
+#			else if motorboat=yes           then 1
+#			else if ship=yes                then 1
+			notdefined
 		else
-			15000	
+			notdefined	
     )
-
 
 ---context:node  # following code refers to node tags
 
-assign control_node_draft
-	switch not depth=             true
-	switch not maxdraft=          true
-	switch not water:depth=       true
-	switch not waterway:mindepth= true
+assign free_height 
+	if seamark:bridge:category=opening then 
+	  switch  and not       seamark:bridge:clearance_height_closed=
+				  greater v:seamark:bridge:clearance_height_closed boat_height true 
+	  false
+	else false
+
+assign waiting_height 
+	if seamark:bridge:category=opening then 
+	  switch  and not      seamark:bridge:clearance_height_closed=
+	              lesser v:seamark:bridge:clearance_height_closed boat_height true 
+	  switch  and not      seamark:bridge:clearance_height=
+	              lesser v:seamark:bridge:clearance_height boat_height true 
+	  false
+	else false
+
+assign no_height 
+	if seamark:bridge:category=opening then 
+	  switch  and not      seamark:bridge:clearance_height_open=
+	              lesser v:seamark:bridge:clearance_height_open boat_height true 
+	  false
+	else if seamark:bridge:category=fixed then 
+	  switch  and not      seamark:bridge:clearance_height=
+	              lesser v:seamark:bridge:clearance_height boat_height true
+	  switch  and not      seamark:bridge:clearance_height_safe=
+	              lesser v:seamark:bridge:clearance_height_safe boat_height true
+      false
+	else 	if seamark:type=cable_overhead then 
+	  switch  and not      seamark:cable_overhead:clearance_height_safe=
+	              lesser v:seamark:cable_overhead:clearance_height_safe boat_height true 
+	  switch  and not      seamark:cable_overhead:clearance_height=
+	              lesser v:seamark:cable_overhead:clearance_height boat_height true 
+      false  
+	else 
+	  false
+
+assign no_width
+	switch and not      seamark:bridge:clearance_width=
+	           lesser v:seamark:bridge:clearance_width boat_width true
 	false
 
-assign control_bridge_fixed_height
-    if seamark:bridge:category=fixed then  true 
-	else false
-
-assign control_bridge_opening_height
-    if seamark:bridge:category=opening then  true 
-	else false
-
-assign control_node_bridge_width
-    if not seamark:bridge:clearance_width= then true
-	else false
-	
-assign control_node_cable_height
-    if not seamark:cable_overhead:clearance_height= then true
-	else false
+assign no_depth
+	switch and not      depth=
+	           lesser v:depth boat_draft true
+	switch and not      maxdraft=
+	           lesser v:maxdraft boat_draft true
+	switch and not      water:depth=
+	           lesser v:water:depth boat_draft true
+	switch and not      waterway:mindepth=
+	           lesser v:waterway:mindepth boat_draft true
+	false
 	
 assign initialcost 
+	switch no_width         notdefined
+	switch no_height        notdefined
+	switch no_depth         notdefined
+	switch waiting_height      waiting_bridge
+#	switch free_height         100
 	switch waterway=lock_gate  waiting_lock
-	switch seamark:bridge:category=opening waiting_bridge
-    switch waterway=waterfall  around_time
 	0
