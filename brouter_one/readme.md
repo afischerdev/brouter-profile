@@ -25,6 +25,8 @@ It can be only compared with the lesser, greater, equal logic
 
 use like:
 
+
+```
 --- waterway.brf
 assign boat_height	1.5  
 
@@ -38,6 +40,8 @@ assign waiting_height
 assign initialcost 
 	switch waiting_height      900
 	0
+
+```
 
 This shows also a problem on using this variables.
 The variable has to be controlled if they comes with a value. Otherwise if delivers -1 as result and can produce wrong results.
