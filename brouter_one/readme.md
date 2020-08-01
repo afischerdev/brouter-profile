@@ -6,9 +6,13 @@ Please see [BRouter feature request ](https://github.com/abrensch/brouter/issues
 
 like:
 
+
+```
 --- lookups.dat
 seamark:bridge:clearance_height_closed;0000000001 *
 depth;0000000001 *
+
+```
 
 This definition save the values behind the variables into the BRouter segment files as a positive integer.
 To have floating values the stored integer is build by value * 100.
