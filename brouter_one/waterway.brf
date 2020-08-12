@@ -1,6 +1,8 @@
 ---model:btools.router.WaterwayModel
 ---context:global   # following code refers to global config
 
+assign   validForVessels          1
+
 # my boat in meter
 assign boat_height	1.5     # %boat_height% | Boat height in Meter | number
 assign boat_width	2.2     # %boat_width% | Boat width in Meter | number
@@ -19,7 +21,7 @@ assign   shortest_way             0   # %shortest_way% | find the direct way | b
 assign   useCEMTonly              0   # %useCEMTonly% | use only CEMT, exclude unmarked like canal, fairway | boolean
 
 assign   turnInstructionMode      1   # 0=none, 1=auto-choose, 2=locus-style, 3=osmand-style, 4=comment-style, 5=gpsies, 6=orux-style
-assign   processUnusedTags        1   # lists all (incl. unused) key/value pairs in geojson
+assign   processUnusedTags        0   # lists all (incl. unused) key/value pairs in geojson
 
 assign   cost1speed               20  # kmh
 assign   inverseRouting           1
@@ -57,7 +59,14 @@ assign no_width
     switch and not      seamark:bridge:clearance_width=
 	           lesser v:seamark:bridge:clearance_width boat_width true
     switch and not      seamark:gate:clearance_width=
-	           lesser v:seamark:gate:clearance_width boat_width true
+	           lesser v:seamark:gate:clearance_width   boat_width true
+    false
+
+assign no_height 
+    switch and not      maxheight=
+	           lesser v:maxheight                      boat_height true
+	switch and not      seamark:gate:clearance_height=	
+               lesser v:seamark:gate:clearance_height  boat_height true
     false
 
 assign	use_CEMT 
@@ -86,21 +95,7 @@ assign maxspeed_impl =
   
 assign maxspeed_expl =
   switch maxspeed=  notdefined
-  switch maxspeed=6 6
-  switch maxspeed=9 9
-  switch maxspeed=4.5 4.5
-  switch maxspeed=5 5
-  switch maxspeed=7 7
-  switch maxspeed=8 8
-  switch maxspeed=10 10
-  switch maxspeed=12 12
-  switch maxspeed=13 13
-  switch maxspeed=13.5 13.5
-  switch maxspeed=15 15
-  switch maxspeed=16 16
-  switch maxspeed=20 20
-  switch maxspeed=25 25
-  notdefined
+  v:maxspeed
 
 assign maxspeed_defined 
   switch lesser maxspeed_expl notdefined maxspeed_expl maxspeed_impl 
@@ -110,8 +105,9 @@ assign maxspeed =
 
 assign costfactor
 	if  and use_CEMT 
-	    or  not no_depth
-            not no_width then (
+	    and  not no_depth
+        and  not no_width
+            not no_height then (
       	1
     )
     else (
@@ -119,7 +115,7 @@ assign costfactor
         else if not useCEMTonly then 
 			switch and 
 			       waterway=canal|river|fairway|safe_water 
-                   or no_depth no_width				           notdefined
+                   or no_depth or no_width no_height          notdefined
             switch waterway=canal|river|fairway|safe_water     1
 			switch and  seamark:type=fairway|recommended_track 
                    or no_depth no_width				           notdefined

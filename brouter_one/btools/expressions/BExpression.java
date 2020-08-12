@@ -165,19 +165,19 @@ final class BExpression
               throw new IllegalArgumentException( "unknown lookup name: " + name );
             }
             ctx.markLookupIdxUsed( exp.lookupNameIdx );
-			StringTokenizer tk = new StringTokenizer( values, "|" );
-			int nt = tk.countTokens();
-			int nt2 = nt == 0 ? 1 : nt;
-			exp.lookupValueIdxArray = new int[nt2];
-			for( int ti=0; ti<nt2; ti++ )
-			{
-			  String value = ti < nt ? tk.nextToken() : "";
-			  exp.lookupValueIdxArray[ti] = ctx.getLookupValueIdx( exp.lookupNameIdx, value );
-			  if ( exp.lookupValueIdxArray[ti] < 0 )
-			  {
-				throw new IllegalArgumentException( "unknown lookup value: " + value );
-			  }
-			}
+            StringTokenizer tk = new StringTokenizer( values, "|" );
+            int nt = tk.countTokens();
+            int nt2 = nt == 0 ? 1 : nt;
+            exp.lookupValueIdxArray = new int[nt2];
+            for( int ti=0; ti<nt2; ti++ )
+            {
+              String value = ti < nt ? tk.nextToken() : "";
+              exp.lookupValueIdxArray[ti] = ctx.getLookupValueIdx( exp.lookupNameIdx, value );
+              if ( exp.lookupValueIdxArray[ti] < 0 )
+              {
+                throw new IllegalArgumentException( "unknown lookup value: " + value );
+              }
+            }
           }
           else if ( ( idx = operator.indexOf( ':' ) ) >= 0 )
           {
@@ -185,13 +185,13 @@ final class BExpression
 				String name = operator.substring(2);
 				exp.typ = VARIABLE_GET_EXP;
 				exp.lookupNameIdx = ctx.getLookupNameIdx( name );
-			    System.out.println( "parse 'v:': " + exp.typ + " " +  name + " " + exp.lookupNameIdx );
+			    //System.out.println( "parse 'v:': " + exp.typ + " " +  name + " " + exp.lookupNameIdx );
 			} else {				
-				String context = operator.substring( 0, idx );
-				String varname = operator.substring( idx+1 );
-				exp.typ = FOREIGN_VARIABLE_EXP;
-				exp.variableIdx = ctx.getForeignVariableIdx( context, varname );
-			}
+            String context = operator.substring( 0, idx );
+            String varname = operator.substring( idx+1 );
+            exp.typ = FOREIGN_VARIABLE_EXP;
+            exp.variableIdx = ctx.getForeignVariableIdx( context, varname );
+          }
           }
           else if ( (idx = ctx.getVariableIdx( operator, false )) >= 0 )
           {
@@ -227,7 +227,7 @@ final class BExpression
     if ( nops > 0  )
     {
       exp.op1 = BExpression.parse( ctx, level+1, exp.typ == ASSIGN_EXP ? "=" : null );
-	}
+    }
     if ( nops > 1  )
     {
       if ( ifThenElse ) checkExpectedToken( ctx, "then" );

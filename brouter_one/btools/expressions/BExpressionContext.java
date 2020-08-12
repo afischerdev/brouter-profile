@@ -594,7 +594,7 @@ public abstract class BExpressionContext implements IByteArrayUnifier
       }
 
       // unknown name, create
-      num = new Integer( lookupValues.size() );
+      num = Integer.valueOf( lookupValues.size() );
       lookupNumbers.put( name, num );
       lookupNames.add( name );
       lookupValues.add( new BExpressionLookupValue[]{ new BExpressionLookupValue( "" )
@@ -623,7 +623,7 @@ public abstract class BExpressionContext implements IByteArrayUnifier
       {
         // do not create unknown value for external data array,
         // record as 'other' instead
-		lookupData2[inum] = 1;
+        lookupData2[inum] = 1;
  	    if (bFoundAsterix) {
 		  // found value for lookup *
 		  //System.out.println( "add unknown " + name + "  " + value );	
@@ -668,16 +668,41 @@ public abstract class BExpressionContext implements IByteArrayUnifier
 				String s = value.substring(0, value.toLowerCase().indexOf("m") );
 				value = s.trim();
 			}	  
+			else if (value.toLowerCase().contains("mph")) {
+				value = value.replace("_", "");
+				String[] sa = value.trim().toLowerCase().split("mph");
+				if (sa.length >= 1) value = sa[0].trim();
+				float mph = Float.parseFloat(value.trim());
+				value = String.format(Locale.US, "%3.1f", mph*1.609344f);
+			}	  
+			else if (value.toLowerCase().contains("knot")) {
+				value = value.replace("_", "");
+				String[] sa = value.trim().toLowerCase().split("knot");
+				if (sa.length >= 1) value = sa[0].trim();
+				float nm = Float.parseFloat(value.trim());
+				value = String.format(Locale.US, "%3.1f", nm*1.852f);
+			}	  
+			else if (value.contains("kmh") || value.contains("km/h") || value.contains("kph")) {
+				value = value.replace("_", "");
+				String[] sa = value.trim().split("k");
+				if (sa.length == 1) value = sa[0].trim();	
+			}	  
 			else if (value.contains("m")) {
 				value = value.replace("_", "");
 				String[] sa = value.trim().split("m");
-				if (sa.length == 1) value = sa[0].trim();
-			
+				if (sa.length == 1) value = sa[0].trim();	
 			}	  
+			else if (value.contains("'")) {
+				value = value.replace("_", "");
+				float feet = 0f;
+				if (value.indexOf("'") > 0) value = value.substring(0,value.indexOf("'"));
+				feet = Float.parseFloat(value.trim());
+				value = String.format(Locale.US, "%3.1f",feet*0.3048f);
+			}
 			// found negative maxdraft values
 		    lookupData2[inum] = 1000 + (int)(Math.abs(Float.parseFloat(value))*100f);		  
 		  } catch ( Exception e) {
-			System.out.println( "error for " + name + "  " + org + " trans " + value + " " + e.getMessage());	
+			System.out.println( "error for " + name + "  " + org + " trans " + value + ": " + e.getMessage());	
 			lookupData2[inum] = 1;
 		  }
 	    } 
@@ -692,19 +717,18 @@ public abstract class BExpressionContext implements IByteArrayUnifier
       {
         return newValue;
       }
-	  // System.out.println( "add " + inum + " " + name + "  " + value );	
-		  // unknown value, create
-		  BExpressionLookupValue[] nvalues = new BExpressionLookupValue[values.length+1];
-		  int[] nhisto = new int[values.length+1];
-		  System.arraycopy( values, 0, nvalues, 0, values.length );
-		  System.arraycopy( histo, 0, nhisto, 0, histo.length );
-		  values = nvalues;
-		  histo = nhisto;
-		  newValue = new BExpressionLookupValue( value );
-		  values[i] = newValue;
-		  lookupHistograms.set(inum, histo);
-		  lookupValues.set(inum, values);
-	} 
+      // unknown value, create
+      BExpressionLookupValue[] nvalues = new BExpressionLookupValue[values.length+1];
+      int[] nhisto = new int[values.length+1];
+      System.arraycopy( values, 0, nvalues, 0, values.length );
+      System.arraycopy( histo, 0, nhisto, 0, histo.length );
+      values = nvalues;
+      histo = nhisto;
+      newValue = new BExpressionLookupValue( value );
+      values[i] = newValue;
+      lookupHistograms.set(inum, histo);
+      lookupValues.set(inum, values);
+    }
 
     histo[i]++;
 
@@ -839,7 +863,7 @@ public abstract class BExpressionContext implements IByteArrayUnifier
       minWriteIdx = variableData == null ? 0 : variableData.length;
 
       expressionList = _parseFile( file );
-	  
+
       // determine the build-in variable indices
       String[] varNames = getBuildInVariableNames();
       nBuildInVars = varNames.length;
@@ -848,7 +872,6 @@ public abstract class BExpressionContext implements IByteArrayUnifier
       {
         buildInVariableIdx[vi] = getVariableIdx( varNames[vi], false );
       }
-
 
       float[] readOnlyData = variableData;
       variableData = new float[variableNumbers.size()];
@@ -890,16 +913,9 @@ public abstract class BExpressionContext implements IByteArrayUnifier
 
   public void setVariableValue(String name, float value, boolean create ) {
     Integer num = variableNumbers.get( name );
-    if ( num == null )
+    if ( num != null )
     {
-      if ( create )
-      {
-        num = new Integer( variableNumbers.size() );
-        variableNumbers.put( name, num );
-      }
-    } else {
-	  variableData[num.intValue()] = value;
-	  System.out.println("setVariableValue: " + name + " "  + num + " = " + value);
+ 	  variableData[num.intValue()] = value;
 	}
   }
 	  
@@ -922,7 +938,7 @@ public abstract class BExpressionContext implements IByteArrayUnifier
     {
       if ( create )
       {
-        num = new Integer( variableNumbers.size() );
+        num = Integer.valueOf( variableNumbers.size() );
         variableNumbers.put( name, num );
       }
       else
