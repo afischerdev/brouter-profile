@@ -9,6 +9,11 @@ like:
 
 ```
 --- lookups.dat
+
+maxheight;0000000001 default no_sign unsigned
+maxheight;0000000001 none
+maxheight;0000000001 *
+
 seamark:bridge:clearance_height_closed;0000000001 *
 depth;0000000001 *
 
@@ -32,8 +37,7 @@ assign boat_height	1.5
 
 assign waiting_height 
 	if seamark:bridge:category=opening then 
-	  switch  and not      seamark:bridge:clearance_height_closed=
-	              lesser v:seamark:bridge:clearance_height_closed boat_height true 
+	  switch lesser v:seamark:bridge:clearance_height_closed boat_height true 
 	  false
 	else false
 
@@ -43,8 +47,9 @@ assign initialcost
 
 ```
 
-This shows also a problem on using this variables.
-The variable has to be controlled if it comes with a value or not. Otherwise if delivers -1 as result and can produce wrong results.
+The variable don't need to be controlled if it comes with a value or not. 
+It can also have a string value as usual. But this should be place before the variable part.
+
 The WaterwayModel/WaterwayPath class are helper classes and can be used to collect e.g. litre per hour.
 
 An other problem is the definition for 'boat_height'. It is s fix value in the profile, but needs an update for an individual value of the user.

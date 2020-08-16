@@ -70,10 +70,14 @@ surface;0000004549 grass_paver
 surface;0000004398 clay
 surface;0000003760 metal
 
+maxspeed;0000000001 none
 maxspeed;0000000001 *
+maxspeed:hgv;0000000001 *
 
-maxheight;0000000001 default
+maxheight;0000000001 default no_sign unsigned
+maxheight;0000000001 none
 maxheight;0000000001 *
+maxheight:physical;0000000001 *
 maxwidth;0000000001 *
 
 service;0001433919 parking_aisle
@@ -704,7 +708,7 @@ seamark:fairway:minimum_depth;0000000001 *
 
 passage_time;0000000001 *
 
-lock;0000000001 yes               
+lock;0000000001 yes
 
 ship;0000001077 yes
 ship;0000000808 no
@@ -983,8 +987,10 @@ traffic_signals:direction;0000062645 forward
 traffic_signals:direction;0000033961 backward
 traffic_signals:direction;0000007309 both
 
-maxheight;0000000001 default
+maxheight;0000000001 default no_sign unsigned
+maxheight;0000000001 none
 maxheight;0000000001 *
+maxheight:physical;0000000001 *
 maxwidth;0000000001 *
 
 seamark:type;0000000001 bridge
@@ -1007,7 +1013,7 @@ seamark:type;0000000001 gate
 seamark:gate:category;0000000001 general
 seamark:gate:category;0000000001 flood_barrage
 seamark:gate:category;0000000001 caisson
-seamark:gate:category;0000000001 lock 
+seamark:gate:category;0000000001 lock
 seamark:gate:category;0000000001 dyke
 seamark:gate:category;0000000001 sluice
 

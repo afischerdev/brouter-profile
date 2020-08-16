@@ -1,0 +1,94 @@
+---context:global   # following code refers to global config
+
+assign   validForBikes            0
+assign   validForCars             1
+
+assign   processUnusedTags        1   # lists all (incl. unused) key/value pairs in geojson
+assign   showspeed                1   # show speed instead of elevation (geojson)
+assign   considerTurnRestrictions 1
+
+assign   shortest_way             1   # 0 as default
+
+assign   cost1speed               1
+
+
+assign   maxSpeed                 999  # km/h (Caution: this is case sensitive internal parameter and different to maxspeed)
+
+assign   default_height           4.5 # %default_height% | Country default brigde height (m) | number
+assign   truck_height             2.5 # %truck_height% | Height of the truck (m) | number
+assign   speed_normal             55  # %speed_normal% | Speed of the truck (kmh) | number
+
+---context:way   # following code refers to way-tags
+
+
+assign turncost 0
+assign initialcost 0
+
+
+assign onewaypenalty
+    switch switch reversedirection=yes
+                     switch oneway=
+                            junction=roundabout
+                            or oneway=yes or oneway=true oneway=1
+                     oneway=-1
+              10000
+    0.0
+
+
+assign bridgecost =
+    switch maxheight=none                               0 
+    switch maxheight=default 
+		switch lesser default_height truck_height       10000
+		0
+    switch not maxheight=
+	    switch lesser v:maxheight truck_height          10000
+		0
+	switch not maxheight:physical=
+	    switch lesser v:maxheight:physical truck_height 10000
+		0
+    0
+
+assign truck_maxspeed =
+# will not work
+#  switch maxspeed=6 6
+
+# will work
+#  switch equal v:maxspeed 6   6 
+
+# will work 
+#   switch lesser v:maxspeed speed_normal   v:maxspeed
+#   speed_normal
+
+# will work 
+#   switch greater speed_normal v:maxspeed  v:maxspeed
+#   speed_normal
+
+# will work
+   min v:maxspeed speed_normal
+
+assign maxspeed  truck_maxspeed
+
+
+assign costfactor
+ add max onewaypenalty 0
+ add max bridgecost 0
+
+ switch highway=                                     10000
+
+ switch or highway=motorway highway=motorway_link    1
+ switch or highway=trunk highway=trunk_link          1
+ switch or highway=primary highway=primary_link      1
+ switch or highway=secondary highway=secondary_link  1
+ switch or highway=tertiary highway=tertiary_link    1
+ switch    highway=unclassified                      1
+ switch    highway=bridleway                         1
+ switch    highway=service                           1
+ switch    route=ferry                               10
+ switch or highway=track or highway=road highway=path
+	switch tracktype=grade1                          1
+	10
+ 10000
+
+---context:node  # following code refers to node tags
+
+assign initialcost 0

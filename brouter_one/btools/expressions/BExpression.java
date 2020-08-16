@@ -55,7 +55,7 @@ final class BExpression
       brackets = true;
       operator = ctx.parseToken();
     }
-    
+
     if ( operator == null )
     {
       if ( level == 0 ) return null;
@@ -181,17 +181,20 @@ final class BExpression
           }
           else if ( ( idx = operator.indexOf( ':' ) ) >= 0 )
           {
-			if (operator.startsWith("v:")) {
-				String name = operator.substring(2);
-				exp.typ = VARIABLE_GET_EXP;
-				exp.lookupNameIdx = ctx.getLookupNameIdx( name );
-			    //System.out.println( "parse 'v:': " + exp.typ + " " +  name + " " + exp.lookupNameIdx );
-			} else {				
-            String context = operator.substring( 0, idx );
-            String varname = operator.substring( idx+1 );
-            exp.typ = FOREIGN_VARIABLE_EXP;
-            exp.variableIdx = ctx.getForeignVariableIdx( context, varname );
-          }
+            if (operator.startsWith("v:")) {
+              String name = operator.substring(2);
+              exp.typ = VARIABLE_GET_EXP;
+              exp.lookupNameIdx = ctx.getLookupNameIdx( name );
+              if ( exp.lookupNameIdx < 0 )
+              {
+                throw new IllegalArgumentException( "unknown lookup name: " + name );
+              }
+            } else {
+              String context = operator.substring( 0, idx );
+              String varname = operator.substring( idx+1 );
+              exp.typ = FOREIGN_VARIABLE_EXP;
+              exp.variableIdx = ctx.getForeignVariableIdx( context, varname );
+            }
           }
           else if ( (idx = ctx.getVariableIdx( operator, false )) >= 0 )
           {
@@ -244,7 +247,7 @@ final class BExpression
     }
     return exp;
   }
-  
+
   private static void checkExpectedToken( BExpressionContext ctx, String expected ) throws Exception
   {
     String token = ctx.parseToken();
@@ -276,7 +279,7 @@ final class BExpression
       case NUMBER_EXP: return numberValue;
       case VARIABLE_EXP: return ctx.getVariableValue( variableIdx );
       case FOREIGN_VARIABLE_EXP: return ctx.getForeignVariableValue( variableIdx );
-	  case VARIABLE_GET_EXP: return ctx.getLookupValue(lookupNameIdx);
+      case VARIABLE_GET_EXP: return ctx.getLookupValue(lookupNameIdx);
       case NOT_EXP: return op1.evaluate(ctx) == 0.f ? 1.f : 0.f;
       default: throw new IllegalArgumentException( "unknown op-code: " + typ );
     }
