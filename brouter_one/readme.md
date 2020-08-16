@@ -50,12 +50,12 @@ assign initialcost
 The variable don't need to be controlled if it comes with a value or not. 
 It can also have a string value as usual. But this should be place before the variable part.
 
+Changes on the original for RoutingContext, BExpression and BExpressionContext
 The WaterwayModel/WaterwayPath class are helper classes and can be used to collect e.g. litre per hour.
 
 An other problem is the definition for 'boat_height'. It is s fix value in the profile, but needs an update for an individual value of the user.
 This should be a change for BRouter too. In BRouter-web this is done by %boat_height%.
 
-Changes on the original for RoutingContext, BExpression and BExpressionContext
 
 Rules
 
