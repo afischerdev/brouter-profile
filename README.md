@@ -12,6 +12,8 @@ With AFTrack since Oct 2020 comes a new BRouter handling. No direct interaction 
 After installation the file 'waterway_nomod.brf' is copied to the AFTrack folder.
 This works with the standard lookups.dat tag table and comes with small waterway routing. 
 
+With AFTrack version 1.12.0 (Jan 2021) comes an internal BRouter version that only works for waterways. It can download BRouter data files for US and Europe. These are very small and only contains the water routing data.
+
 To use all this inside AFTrack, do a long press on the map and select the ruler. It offers you two point to define start and end of a route. You can add points at the active point when you touch the second ring. Then select the routing mode and press the search button.  
 
 ![Routing result](AFTrack_brouter.png)
