@@ -22,7 +22,7 @@ To use all this inside AFTrack, do a long press on the map and select the ruler.
 
 There is now a setting dialog for the routing preferences.
 By tap on a BRouter routing name you can define your favorite routing profile. 
-To draw a new route when you move a routing point please select the checkbox 'Route direct'.
+To draw a new route when you move a routing point please select the checkbox 'Route direct'. The waterway routing has its own data files with width, height and depth on canal or rivers and other (Europe and North America only) - see project folder ['brouter one'](https://github.com/afischerdev/brouter-profile/tree/master/brouter_one).
 
 ![Routing settings](AFTrack_routing_setting.png)
 
