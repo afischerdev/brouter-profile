@@ -26,6 +26,11 @@ To draw a new route when you move a routing point please select the checkbox 'Ro
 
 ![Routing settings](AFTrack_routing_setting.png)
 
+And a work around for the calculation of splitted routes. Define a point as 'not routable' (coloar changes) and the distance is calculated direct.
+
+![Multi Routing](AFTrack_multi_routing.png)
+
+
 
 When you are looking for smaller boats like canoe please use the river_canoe.brf. This is a copy of [Git](https://github.com/poutnikl/Brouter-profiles).
 
