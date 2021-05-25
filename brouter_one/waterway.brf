@@ -1,12 +1,14 @@
 ---model:btools.router.WaterwayModel
 ---context:global   # following code refers to global config
 
-assign   validForVessels          1
+assign   validForBoat          1
+
+assign waypointCatchingRange 1250   # find waypoint in range
 
 # my boat in meter
 assign boat_height	1.5     # %boat_height% | Boat height in Meter | number
 assign boat_width	2.2     # %boat_width% | Boat width in Meter | number
-assign boat_length	10.0	# Boat height in Meter | (not used now)
+assign boat_length	10.0	# Boat length in Meter | (not used now)
 assign boat_draft	1.2		# %boat_draft% | Boat draft in Meter | number
 assign literHour    1.0		# %literHour% | liter per hour | number
 
@@ -14,13 +16,13 @@ assign literHour    1.0		# %literHour% | liter per hour | number
 assign  maxSpeed             18  # km/h (Caution: this is case sensitive internal parameter and different to maxspeed)
                                  # handle with care, this belongs to your local area and your boat
 assign  speed_normal         10  # %speed_normal% | Speed in kmh | number
-assign  flow_rate            0   # %flow_rate% | Flow in kmh | number
+assign  flow_rate            0   # %flow_rate% | Flow on a river in kmh | number
 
 assign   shortest_way             0   # %shortest_way% | find the direct way | boolean
 
 assign   useCEMTonly              0   # %useCEMTonly% | use only CEMT, exclude unmarked like canal, fairway | boolean
 
-assign   turnInstructionMode      1   # 0=none, 1=auto-choose, 2=locus-style, 3=osmand-style, 4=comment-style, 5=gpsies, 6=orux-style
+assign   turnInstructionMode      4   # 0=none, 1=auto-choose, 2=locus-style, 3=osmand-style, 4=comment-style, 5=gpsies, 6=orux-style
 assign   processUnusedTags        0   # lists all (incl. unused) key/value pairs in geojson
 
 assign   cost1speed               20  # kmh
@@ -38,6 +40,16 @@ assign   notdefined               100000
 assign turncost 0
 assign initialcost 0
 
+assign not_used
+    switch access=no                      true
+	switch access=private				  true
+	switch boat=no|private                true
+    switch disused=yes                    true
+    switch disused:lock=yes               true
+    switch disused:waterway=yes           true
+    switch disused:waterway=lock          true
+	false
+	
 assign no_depth 
 	switch  and not      depth=
 	            lesser v:depth boat_draft                          true
@@ -60,6 +72,10 @@ assign no_width
 	           lesser v:seamark:bridge:clearance_width boat_width true
     switch and not      seamark:gate:clearance_width=
 	           lesser v:seamark:gate:clearance_width   boat_width true
+    switch and not      width=
+	           lesser v:width                          boat_width true
+    switch and not      maxwidth=
+	           lesser v:maxwidth                       boat_width true
     false
 
 assign no_height 
@@ -81,8 +97,8 @@ assign	use_CEMT
 
 
 assign boat_maxspeed =
-  if ( and waterway=river reversedirection=yes ) then add speed_normal flow_rate 
-  else if ( and waterway=river reversedirection= ) then sub speed_normal flow_rate
+  if ( and waterway=river reversedirection=yes ) then sub speed_normal flow_rate 
+  else if ( and waterway=river reversedirection= ) then add speed_normal flow_rate
   else speed_normal
 
 
@@ -94,8 +110,26 @@ assign maxspeed_impl =
   20
   
 assign maxspeed_expl =
-  switch maxspeed=  notdefined
-  v:maxspeed
+  if  not maxspeed= then (
+	  switch maxspeed=4.5 4.5
+	  switch maxspeed=5 5
+	  switch maxspeed=6 6
+	  switch maxspeed=7 7
+	  switch maxspeed=8 8
+	  switch maxspeed=9 9
+	  switch maxspeed=10 10
+	  switch maxspeed=12 12
+	  switch maxspeed=13 13
+	  switch maxspeed=13.5 13.5
+	  switch maxspeed=15 15
+	  switch maxspeed=16 16
+	  switch maxspeed=20 20
+	  switch maxspeed=25 25
+	  notdefined
+	  )
+  else
+	  switch waterway:maxspeed= notdefined
+	  v:waterway:maxspeed
 
 assign maxspeed_defined 
   switch lesser maxspeed_expl notdefined maxspeed_expl maxspeed_impl 
@@ -106,23 +140,25 @@ assign maxspeed =
 assign costfactor
 	if  and use_CEMT 
 	    and  not no_depth
-        and  not no_width
-            not no_height then (
+        and not no_width
+        and not no_height
+			not not_used	then (
       	1
     )
     else (
         if      waterway=                   then notdefined
-        else if not useCEMTonly then 
-			switch and 
-			       waterway=canal|river|fairway|safe_water 
-                   or no_depth or no_width no_height          notdefined
-            switch waterway=canal|river|fairway|safe_water     1
-			switch and  seamark:type=fairway|recommended_track 
-                   or no_depth no_width				           notdefined
+		else if not_used                    then notdefined
+		else if no_depth                    then notdefined
+		else if no_width                    then notdefined
+		else if no_height                   then notdefined
+        else if not useCEMTonly then (
+			switch waterway=canal|river|fairway|safe_water     1
 			switch seamark:type=fairway|recommended_track      1 
+            switch not whitewater=                             1
 #			else if motorboat=yes           then 1
 #			else if ship=yes                then 1
 			notdefined
+			)
 		else
 			notdefined	
     )

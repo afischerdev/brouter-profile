@@ -1,10 +1,11 @@
 ---context:global   # following code refers to global config
 
-assign   validForBikes            1
+assign   validForFoot             0   # helps to get a time variable, limit is foot speed, not variable
+assign   validForBikes            1   # helps to get a time variable
 assign   validForCars             0
-assign   validForVessels          1
+assign   validForBoat             1   # this is a nice to have, does nothing
 
-assign   shortest_way             1   # 0 as default
+assign   shortest_way             1   # %shortest_way% | use the shortest way | boolean
 
 assign   speed_normal             10  # %speed_normal% | Speed in kmh | number
 
@@ -29,7 +30,10 @@ assign   notdefined               100000
 
 ---context:way   # following code refers to way-tags
 
-assign maxspeed speed_normal
+assign maxspeed 
+#	switch waterway=lock_basin	1
+	switch waterway=lock	1
+	speed_normal
 
 assign pass_bridge 
     true
@@ -41,6 +45,20 @@ assign pass_lock
 #	else
     true
 
+assign not_used
+	switch boat=no                        true
+	switch boat=private				      true
+	switch access=private				  true
+    switch access=no                      true
+	false
+
+assign is_waterway
+	switch waterway=river|canal|fairway|lock       true
+	switch seamark:type=fairway|recommended_track  true
+	switch boat=yes|permissive|designated          true
+	switch motorboat=yes                           true
+	false
+
 	
 assign turncost        0
 
@@ -48,12 +66,10 @@ assign initialcost     0
 
 
 assign costfactor
-    if      waterway=                   then notdefined
-    else 
-		switch waterway=canal|river|fairway                1
-		switch seamark:type=fairway|recommended_track      1 
-		switch motorboat=yes                               1
-		notdefined
+	switch waterway=lock    		        waiting_lock
+	switch and is_waterway not_used    		notdefined
+	switch is_waterway              		1
+	notdefined
 		
 
 
@@ -61,5 +77,5 @@ assign costfactor
 
 
 assign initialcost 
-	switch waterway=lock_gate  waiting_lock
+	switch waterway=lock_gate|lock  waiting_lock
 	0

@@ -1,0 +1,106 @@
+---context:global   # following code refers to global config
+
+# port from https://github.com/poutnikl/Brouter-profiles/blob/master/river-poutnik.brf
+# V1.0.1 fixed evaluation order for boot=no
+# V1.0.2 fixed fish_pass
+# V1.0.3 increased canal costfactor
+# V1.0.4 use boat=no 
+
+assign   validForFoot             0   # helps to get a time variable, limit is foot speed, not variable
+assign   validForBikes            1   # helps to get a time variable
+assign   validForCars             0
+assign   validForBoat             1   # this is a nice to have, does nothing
+
+assign   shortest_way             1   # %shortest_way% | use the shortest way | boolean
+
+assign   speed_normal             3   # %speed_normal% | Speed in kmh | number
+
+# my boat has max speed
+assign   maxSpeed                 6   # km/h (Caution: this is case sensitive internal parameter and different to maxspeed)
+                                      # handle with care, this belongs to your local area and your boat
+
+assign portable_boat              1
+
+assign carry_cost 500
+assign wait_cost 500
+
+assign   showspeed                1   # show speed instead of elevation (geojson)
+
+assign downhillcost 0
+assign downhillcutoff 1.5
+assign uphillcost 0
+assign uphillcutoff 1.5
+
+assign   notdefined               100000
+
+
+---context:way   # following code refers to way-tags
+
+assign not_used
+	switch boat=no                        true
+	switch boat=private				      true
+	switch access=private				  true
+    switch access=no                      true
+	false
+
+assign is_waterway
+	switch and waterway=river|canal not_used       true
+	switch waterway=river|canal|fairway|lock       true
+	switch seamark:type=fairway|recommended_track  true
+	switch boat=yes|permissive|designated          true
+	switch motorboat=yes                           true
+	false
+
+# speed not used 
+assign maxspeed 
+	switch and is_waterway and not_used portable_boat 1
+	switch and is_waterway not_used                   0
+	switch and waterway=river reversedirection=yes    2
+	switch waterway=river                             5
+	switch is_waterway	                              3
+	speed_normal
+	
+
+assign turncost 
+    if portable_boat then 20 
+	else 100
+
+assign initialcost 
+    if waterway=riverbank           then notdefined
+    else if boat=no|private         then ( if portable_boat then carry_cost else notdefined )
+    else if access=no|private       then ( if portable_boat then carry_cost else notdefined )
+    else if waterway=weir           then ( if portable_boat then carry_cost else notdefined )
+    else if waterway=dam            then ( if portable_boat then multiply 4 carry_cost else notdefined )
+    else if waterway=lock|lock_gate then ( if portable_boat then carry_cost else wait_cost )
+    else if waterway=fish_pass      then ( if portable_boat then carry_cost else notdefined )
+#    else if lock=yes  then ( 1000 )
+    else 0
+
+
+assign costfactor
+	switch and is_waterway and  not_used portable_boat  10
+	switch is_waterway                                  1
+	switch and portable_boat waterway=weir|dam          10
+	switch and portable_boat waterway=tidal_flat_slough 2
+	switch waterway=tidal_flat_slough                   20
+	switch and portable_boat route=canoe                2
+	notdefined
+
+
+
+
+
+
+
+---context:node  # following code refers to node tags
+
+
+assign initialcost 
+    if waterway=weir                 then ( if portable_boat then carry_cost             else notdefined )
+#    else if boat=no                  then ( if portable_boat then carry_cost             else notdefined )
+    else if access=no                then ( if portable_boat then carry_cost             else notdefined )
+    else if waterway=waterfall       then ( if portable_boat then multiply 10 carry_cost else notdefined )
+    else if ford=yes                 then ( if portable_boat then 0                      else notdefined )
+    else if ford=stepping_stones     then ( if portable_boat then carry_cost             else notdefined )
+    else if waterway=lock_gate|lock  then ( if portable_boat then carry_cost             else wait_cost )
+    else 0

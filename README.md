@@ -4,8 +4,12 @@ This is based on the work of the BRouter project. Please see [Git](https://githu
 and [Google Play](https://play.google.com/store/apps/details?id=btools.routingapp) or [F-Droid](https://f-droid.org/packages/btools.routingapp) for installation.
 
 There are some files for use:
-* waterway_nomod.brf . works with standard lookup table and standard data files
-* waterway_future.brf . contains some ideas, see brouter_one for more
+* waterway_nomod.brf    . works with standard lookup table and standard data files
+* river_canoe_nomod.brf . works also with the standard (adapted from [river_poutnikl.brf](https://github.com/poutnikl/Brouter-profiles))
+* lookups_all_mod.dat   . contains sample lookups for the next generation lookup table
+* waterway_mod.brf      . works with a modified lookup table
+* river_canoe_mod.brf   . needs a modification on lookup table
+* waterway_future.brf   . contains some ideas, see brouter_one for more
 * folder brouter_one contains an update for brouter classes, lookup and waterway.brf for that
 
 With AFTrack since Oct 2020 comes a new BRouter handling. No direct interaction with BRouter profiles needed. 
@@ -30,9 +34,9 @@ And a work around for the calculation of splitted routes. Define a point as 'not
 
 ![Multi Routing](AFTrack_multi_routing.png)
 
+This can be combined with wind routing. Attention, the routing with wind is ideal - only one angle related to the wind. There are also currents, changes in wind direction and other things.
+![Multi Routing with wind](AFTrack_multi_wind_routing.png)
 
-
-When you are looking for smaller boats like canoe please use the river_canoe.brf. This is a copy of [Git](https://github.com/poutnikl/Brouter-profiles).
 
 river.brf is a template from BRouter project for own experiments.
 
