@@ -66,38 +66,38 @@ assign priorityclassifier
   else 0
   
 assign not_used
-	switch boat=no                        true
-	switch boat=private				      true
-	switch access=private				  true
+    switch boat=no                        true
+    switch boat=private                   true
+    switch access=private                 true
     switch access=no                      true
-	false
+    false
 
 assign is_waterway
-	switch waterway=river|canal|fairway|lock       true
-	switch seamark:type=fairway|recommended_track  true
-	switch boat=yes|permissive|designated          true
-	switch motorboat=yes                           true
-	switch route=canoe                             true
-	false
+    switch waterway=river|canal|fairway|lock       true
+    switch seamark:type=fairway|recommended_track  true
+    switch boat=yes|permissive|designated          true
+    switch motorboat=yes                           true
+    switch route=canoe                             true
+    false
 
 # speed not used 
 assign maxspeed 
-	switch and is_waterway and not_used portable_boat 1
+    switch and is_waterway and not_used portable_boat 1
     switch and is_waterway and not_used
-	                           not portable_boat      0
+                               not portable_boat      0
     switch     waterway=lock                          1
     switch and waterway=river reversedirection=yes    sub speed_normal flow_rate
     switch     waterway=river                         add speed_normal flow_rate
     switch     is_waterway                            speed_normal
-	speed_normal
-	
+    speed_normal
+    
 
 assign turncost 0
 #    if portable_boat then 20 
 #    else 100
 
 
-	
+    
 # does not work for extra time
 assign initialcost 
     if      waterway=riverbank      then notdefined
@@ -111,12 +111,12 @@ assign initialcost
 
 # so we use factor
 assign costfactor
-	switch and waterway=lock portable_boat              3
-	switch     waterway=lock                               5
-	switch and is_waterway and  not_used portable_boat  10
-	switch and portable_boat waterway=weir|dam          10
-	switch is_waterway                                  1
-	notdefined
+    switch and waterway=lock portable_boat              3
+    switch     waterway=lock                               5
+    switch and is_waterway and  not_used portable_boat  10
+    switch and portable_boat waterway=weir|dam          10
+    switch is_waterway                                  1
+    notdefined
 
 
 

@@ -14,7 +14,7 @@ assign   validForCars             0
 assign   validForBoat             1   # this is a nice to have, does nothing
 
 # my boat in meter
-assign   boat_height	          1.0 # %boat_height% | Boat height in Meter | number
+assign   boat_height              1.0 # %boat_height% | Boat height in Meter | number
 assign   shortest_way             1   # %shortest_way% | use the shortest way | boolean
 
 assign   speed_normal             3   # %speed_normal% | Speed in kmh | number
@@ -72,12 +72,12 @@ assign priorityclassifier
 assign not_used
     switch and boat=no canoe=             true
     switch and boat=no canoe=no           true
-    switch boat=private                   true
-    switch canoe=no                       true
-    switch access=no                      true
-    switch access=private                 true
-	switch disused=yes                    true
-	switch disused:waterway=yes           true
+    switch     boat=private               true
+    switch     canoe=no                   true
+    switch     access=no                  true
+    switch     access=private             true
+    switch     disused=yes                true
+    switch     disused:waterway=yes       true
     false
 
 assign is_waterway
@@ -99,7 +99,7 @@ assign is_portageway
 assign maxspeed 
     switch and is_waterway and not_used portable_boat 1
     switch and is_waterway and not_used
-	                           not portable_boat      notdefined
+                               not portable_boat      notdefined
     switch     is_portageway                          1
     switch and is_waterway lock=yes                   1.1
     switch and waterway=river reversedirection=yes    sub speed_normal flow_rate
@@ -113,7 +113,7 @@ assign turncost 0
 #    else 100
 
 
-	
+    
 # does not work for extra time
 assign initialcost
          if boat=no|private         then ( if portable_boat then carry_cost else notdefined )
@@ -125,7 +125,7 @@ assign initialcost
     else if waterway=lock|lock_gate then ( if portable_boat then carry_cost else wait_cost )
     else if seamark:type=lock_basin then ( if portable_boat then carry_cost else wait_cost )
     else if lock=yes                then ( if portable_boat then carry_cost else wait_cost )
-    else if obstacle=lock	        then ( if portable_boat then carry_cost else wait_cost )
+    else if obstacle=lock           then ( if portable_boat then carry_cost else wait_cost )
     else 0
 
 
@@ -146,7 +146,7 @@ assign costfactor
 ---context:node  # following code refers to node tags
 
 
-assign initialcost 	
+assign initialcost  
          if waterway=weir                          then ( if portable_boat then carry_cost             else notdefined )
     else if boat=no                                then ( if portable_boat then carry_cost             else notdefined )
     else if access=no                              then ( if portable_boat then carry_cost             else notdefined )
