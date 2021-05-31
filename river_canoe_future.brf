@@ -107,7 +107,6 @@ assign maxspeed
     switch and is_waterway and not_used portable_boat 1
     switch and is_waterway and not_used
 	                           not portable_boat      notdefined
-#    switch     waterway=riverbank                     notdefined							   
     switch     is_portageway                          1
     switch and is_waterway lock=yes                   1.1
     switch and waterway=river reversedirection=yes    sub speed_normal flow_rate
@@ -121,7 +120,6 @@ assign turncost 0
 #    else 100
 
 
-assign xxinitialcost 0 
 
 assign initialcost 
          if waterway=riverbank      then ( notdefined )
@@ -137,8 +135,6 @@ assign initialcost
     else if obstacle=lock	        then ( if portable_boat then carry_cost else wait_cost )
     else 0
 
-
-assign xxxcostfactor 1
 
 # when initialcost not work set a factor
 assign costfactor 
@@ -164,7 +160,7 @@ assign initialcost
     else if whitewater=put_in|egress|put_in;egress then ( if portable_boat then carry_cost             else notdefined )
     else if waterway=waterfall                     then ( if portable_boat then multiply 10 carry_cost else notdefined )
     else if ford=yes                               then ( if portable_boat then 0                      else notdefined )
-#    else if ford=boat                              then ( 0 )
+    else if ford=boat                              then ( 0 )
     else if ford=stepping_stones                   then ( if portable_boat then carry_cost             else notdefined )
     else if waterway=lock_gate|lock                then ( if portable_boat then carry_cost             else wait_cost )
     else 0

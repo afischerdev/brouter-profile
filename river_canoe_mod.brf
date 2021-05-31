@@ -70,7 +70,8 @@ assign priorityclassifier
   else 0
 
 assign not_used
-    switch boat=no                        true
+    switch and boat=no canoe=             true
+    switch and boat=no canoe=no           true
     switch boat=private                   true
     switch canoe=no                       true
     switch access=no                      true
