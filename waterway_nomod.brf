@@ -9,6 +9,8 @@ assign   shortest_way             1   # %shortest_way% | use the shortest way | 
 
 assign   speed_normal             10  # %speed_normal% | Speed in kmh | number
 
+assign   flow_rate                0   # %flow_rate% | Flow on a river in kmh | number
+
 # my boat has max speed
 assign   maxSpeed                 18  # km/h (Caution: this is case sensitive internal parameter and different to maxspeed)
                                       # handle with care, this belongs to your local area and your boat
@@ -17,6 +19,7 @@ assign   processUnusedTags        0   # lists all (incl. unused) key/value pairs
 assign   showspeed                1   # show speed instead of elevation (geojson)
 
 # Turn instructions settings
+assign considerTurnRestrictions     = true
 assign turnInstructionMode          = 4     # Mode for the generated turn instructions | [0=none, 1=auto-choose, 2=locus-style, 3=osmand-style, 4=comment-style, 5=gpsies-style, 6=orux-style]
 assign turnInstructionCatchingRange = 40    # Within this distance (in m) several turning instructions are combined into one and the turning angles are better approximated to the general direction | number
 assign turnInstructionRoundabouts   = false # Set to "false" to avoid generating special turning instructions for roundabouts | boolean
@@ -30,20 +33,6 @@ assign   notdefined               100000
 
 ---context:way   # following code refers to way-tags
 
-assign maxspeed 
-#	switch waterway=lock_basin	1
-	switch waterway=lock	1
-	speed_normal
-
-assign pass_bridge 
-    true
-	
-assign pass_lock 
-#	if seamark:type=lock_basin then (
-#		true
-#		)
-#	else
-    true
 
 assign not_used
 	switch boat=no                        true
@@ -58,6 +47,13 @@ assign is_waterway
 	switch boat=yes|permissive|designated          true
 	switch motorboat=yes                           true
 	false
+	
+assign maxspeed 
+    switch and is_waterway not_used                   0
+    switch and waterway=river reversedirection=yes    sub speed_normal flow_rate
+    switch     waterway=river                         add speed_normal flow_rate
+    switch     is_waterway                            speed_normal
+	speed_normal
 
 	
 assign turncost        0
@@ -66,8 +62,8 @@ assign initialcost     0
 
 
 assign costfactor
-	switch waterway=lock    		        waiting_lock
 	switch and is_waterway not_used    		notdefined
+	switch waterway=lock    		        10
 	switch is_waterway              		1
 	notdefined
 		

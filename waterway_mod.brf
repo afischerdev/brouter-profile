@@ -9,6 +9,8 @@ assign   shortest_way             1   # %shortest_way% | use the shortest way | 
 
 assign   speed_normal             10  # %speed_normal% | Speed in kmh | number
 
+assign   flow_rate                0   # %flow_rate% | Flow on a river in kmh | number
+
 # my boat has max speed
 assign   maxSpeed                 18  # km/h (Caution: this is case sensitive internal parameter and different to maxspeed)
                                       # handle with care, this belongs to your local area and your boat
@@ -75,13 +77,13 @@ assign maxspeed_pre
     switch maxspeed=16 16
     switch maxspeed=20 20
     switch maxspeed=25 25
+    switch waterway=lock            1
+    switch lock=yes                 1
     switch CEMT=0                   6
     switch CEMT=I|II|III|IV         10
     switch CEMT=V|Va|Vb             12
     switch CEMT=VI|VIa|VIb|VIc|VII  15
     switch seamark:type=lock_basin  1
-    switch waterway=lock            1
-    switch lock=yes                 1
     speed_normal
 
 assign maxspeed

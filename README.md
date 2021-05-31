@@ -9,6 +9,7 @@ There are some files for use:
 * lookups_all_mod.dat   . contains sample lookups for the next generation lookup table
 * waterway_mod.brf      . works with a modified lookup table
 * river_canoe_mod.brf   . needs a modification on lookup table
+* river_canoe_future.brf  . needs more modification on lookup table with variable values
 * waterway_future.brf   . contains some ideas, see brouter_one for more
 * folder brouter_one contains an update for brouter classes, lookup and waterway.brf for that
 
@@ -16,7 +17,7 @@ With AFTrack since Oct 2020 comes a new BRouter handling. No direct interaction 
 After installation the file 'waterway_nomod.brf' is copied to the AFTrack folder.
 This works with the standard lookups.dat tag table and comes with small waterway routing. 
 
-With AFTrack version 1.12.0 (Jan 2021) comes an internal BRouter version that only works for waterways. It can download BRouter data files for US and Europe. These are very small and only contains the water routing data.
+With AFTrack version 1.12.0 (Jan 2021) comes an internal BRouter version that only works for waterways. It can download BRouter data files for US and Europe. These are very small and only contains the water routing data (e.g. E3_N50 = 3.4M / org. 131M). Please see it as a proof of concept.
 
 To use all this inside AFTrack, do a long press on the map and select the ruler. It offers you two point to define start and end of a route. You can add points at the active point when you touch the second ring. Then select the routing mode and press the search button.  
 

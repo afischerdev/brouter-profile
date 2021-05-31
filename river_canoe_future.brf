@@ -1,6 +1,9 @@
+#---model:btools.router.WaterwayModel
 ---context:global   # following code refers to global config
-# https://github.com/afischerdev/brouter-profile/blob/master/waterway_mod.brf
-# needs an update like https://github.com/afischerdev/brouter-profile/blob/master/lookups_all_mod.dat
+
+# https://github.com/afischerdev/brouter-profile/blob/master/river_canoe_future.brf
+# needs an update like https://github.com/afischerdev/brouter-profile/tree/master/brouter_one
+# with new tags and free values 
 #
 # port from https://github.com/poutnikl/Brouter-profiles/blob/master/river-poutnik.brf
 # V1.0.1 fixed evaluation order for boot=no
@@ -68,9 +71,12 @@ assign priorityclassifier
   else if ( and boat=yes|permissive|designated
                 reversedirection=yes            ) then  27
   else 0
+  
+assign xxnot_used false
 
 assign not_used
-    switch boat=no                        true
+    switch and boat=no canoe=             true
+    switch and boat=no canoe=no           true
     switch boat=private                   true
     switch canoe=no                       true
     switch access=no                      true
@@ -80,6 +86,8 @@ assign not_used
     false
 
 assign is_waterway
+    switch and not maxheight=
+	           lesser boat_height v:maxheight           true
     switch     waterway=river|canal|fairway|lock        true
     switch     seamark:type=fairway|recommended_track   true
     switch     waterway=navigation                      true
@@ -90,8 +98,8 @@ assign is_waterway
     false
 
 assign is_portageway
-    switch and whitewater=portage_way portable_boat     true 
-    switch and canoe=portage portable_boat              true
+    switch and whitewater=portage_way portable_boat true 
+    switch and canoe=portage portable_boat          true
     false
 
 # speed not used correct
@@ -99,6 +107,7 @@ assign maxspeed
     switch and is_waterway and not_used portable_boat 1
     switch and is_waterway and not_used
 	                           not portable_boat      notdefined
+#    switch     waterway=riverbank                     notdefined							   
     switch     is_portageway                          1
     switch and is_waterway lock=yes                   1.1
     switch and waterway=river reversedirection=yes    sub speed_normal flow_rate
@@ -112,10 +121,11 @@ assign turncost 0
 #    else 100
 
 
-	
-# does not work for extra time
-assign initialcost
-         if boat=no|private         then ( if portable_boat then carry_cost else notdefined )
+assign xxinitialcost 0 
+
+assign initialcost 
+         if waterway=riverbank      then ( notdefined )
+    else if boat=no|private         then ( if portable_boat then carry_cost else notdefined )
     else if access=no|private       then ( if portable_boat then carry_cost else notdefined )
     else if waterway=weir           then ( if portable_boat then carry_cost else notdefined )
     else if waterway=dam            then ( if portable_boat then multiply 4 carry_cost else notdefined )
@@ -128,15 +138,17 @@ assign initialcost
     else 0
 
 
-# so we use factor
+assign xxxcostfactor 1
+
+# when initialcost not work set a factor
 assign costfactor 
-    switch and is_waterway and  not_used portable_boat  20
+    switch and is_waterway and  not_used portable_boat  10
     switch is_portageway                                3
     switch lock=yes                                     6
     switch is_waterway                                  1
     switch and portable_boat waterway=weir|dam          10
     switch and portable_boat waterway=tidal_channel     2
-    switch waterway=tidal_channel                       10
+    switch     waterway=tidal_channel                   5
     switch and portable_boat route=canoe                1
     notdefined
 
@@ -145,8 +157,8 @@ assign costfactor
 ---context:node  # following code refers to node tags
 
 
-assign initialcost 	
-         if waterway=weir                          then ( if portable_boat then carry_cost             else notdefined )
+assign initialcost 
+    if waterway=weir                               then ( if portable_boat then carry_cost             else notdefined )
     else if boat=no                                then ( if portable_boat then carry_cost             else notdefined )
     else if access=no                              then ( if portable_boat then carry_cost             else notdefined )
     else if whitewater=put_in|egress|put_in;egress then ( if portable_boat then carry_cost             else notdefined )
