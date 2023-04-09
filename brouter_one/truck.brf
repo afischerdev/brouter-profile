@@ -7,7 +7,7 @@ assign   processUnusedTags        1   # lists all (incl. unused) key/value pairs
 assign   showspeed                1   # show speed instead of elevation (geojson)
 assign   considerTurnRestrictions 1
 
-assign   shortest_way             1   # 0 as default
+assign   shortest_way             0   # 0 as default
 
 assign   cost1speed               1
 

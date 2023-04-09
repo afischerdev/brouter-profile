@@ -1,0 +1,33 @@
+---context:global   # following code refers to global config
+
+# the elevation parameters
+
+assign downhillcost 0
+assign downhillcutoff 1.5
+assign uphillcost 0
+assign uphillcutoff 1.5
+
+---context:way   # following code refers to way-tags
+
+assign turncost 0
+assign initialcost 0
+
+assign costfactor
+  switch waterway=stream|ditch|drain
+         switch boat=yes                    1
+         switch canoe=yes                   1
+		                                    100000
+#  switch not highway=                      1
+#  switch not railway=                      1
+  switch not or waterway= waterway=unknown  1
+  switch not whitewater=  1
+  switch boat=yes         1
+  switch not canoe=       1
+  switch not water=       1
+  switch not route=       1
+  switch man_made=pier    1
+  100000
+
+---context:node  # following code refers to node tags
+
+assign initialcost 0

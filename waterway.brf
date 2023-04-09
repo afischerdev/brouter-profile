@@ -1,3 +1,4 @@
+
 ---model:btools.router.WaterwayModel
 ---context:global   # following code refers to global config
 
@@ -6,30 +7,30 @@ assign   validForBoat          1
 assign waypointCatchingRange 1250   # find waypoint in range
 
 # my boat in meter
-assign boat_height	1.5     # %boat_height% | Boat height in Meter | number
+assign boat_height	2.5     # %boat_height% | Boat height in Meter | number
 assign boat_width	2.2     # %boat_width% | Boat width in Meter | number
 assign boat_length	10.0	# Boat length in Meter | (not used now)
 assign boat_draft	1.2		# %boat_draft% | Boat draft in Meter | number
 assign literHour    1.0		# %literHour% | liter per hour | number
 
 # my boat has max speed
-assign  maxSpeed             18  # km/h (Caution: this is case sensitive internal parameter and different to maxspeed)
+assign  maxSpeed            999  # km/h (Caution: this is case sensitive internal parameter and different to maxspeed)
                                  # handle with care, this belongs to your local area and your boat
 assign  speed_normal         10  # %speed_normal% | Speed in kmh | number
 assign  flow_rate            0   # %flow_rate% | Flow on a river in kmh | number
 
-assign   shortest_way             1   # %shortest_way% | find the direct way | boolean
+assign   shortest_way             0   # %shortest_way% | find the direct way | boolean
 
 assign   useCEMTonly              0   # %useCEMTonly% | use only CEMT or motorboat=yes, exclude unmarked waterways | boolean
 
-assign   processUnusedTags        0   # lists all (incl. unused) key/value pairs in geojson
+assign   processUnusedTags        1   # lists all (incl. unused) key/value pairs in geojson
 
 assign   cost1speed               20  # kmh
 assign   showspeed                1   # show speed instead of elevation (geojson)
 
 # Turn instructions settings
 assign turnInstructionMode          4     # Mode for the generated turn instructions | [0=none, 1=auto-choose, 2=locus-style, 3=osmand-style, 4=comment-style, 5=gpsies-style, 6=orux-style]
-assign inverseRouting           	0     # 
+assign inverseRouting           	0     #
 assign turnInstructionCatchingRange 40    # Within this distance (in m) several turning instructions are combined into one and the turning angles are better approximated to the general direction | number
 assign turnInstructionRoundabouts   false # Set to "false" to avoid generating special turning instructions for roundabouts | boolean
 
@@ -48,13 +49,15 @@ assign not_used
     switch access=no                      true
 	switch access=private				  true
 	switch boat=no|private                true
+	switch motorboat=no|private           true
     switch disused=yes                    true
     switch disused:lock=yes               true
     switch disused:waterway=yes           true
     switch disused:waterway=lock          true
+  switch and CEMT= and motorboat= and boat= ship=    true
 	false
-	
-assign no_depth 
+
+assign no_depth
 	switch  and not      depth=
 	            lesser v:depth boat_draft                          true
 	switch  and not      maxdraft=
@@ -71,7 +74,7 @@ assign no_depth
 	            lesser v:seamark:fairway:minimum_depth boat_draft  true
 	false
 
-assign no_width 
+assign no_width
     switch and not      seamark:bridge:clearance_width=
 	           lesser v:seamark:bridge:clearance_width boat_width true
     switch and not      seamark:gate:clearance_width=
@@ -82,38 +85,38 @@ assign no_width
 	           lesser v:maxwidth                       boat_width true
     false
 
-assign no_height 
+assign no_height
     switch and not      maxheight=
 	           lesser v:maxheight                      boat_height true
-	switch and not      seamark:gate:clearance_height=	
+	switch and not      seamark:gate:clearance_height=
                lesser v:seamark:gate:clearance_height  boat_height true
     false
 
-assign	use_CEMT 
+assign	use_CEMT
     if not CEMT= then (
 		switch motorboat=no false
 		switch ship=no      false
 		switch CEMT=0|I|II|III|IV|V|Va|Vb|VI|VIa|VIb|VIc|VII true	# make sure to drop classes you can't use
         false
     )
-    else 
+    else
 		switch and not waterway= motorboat=yes     true
 	    false
 
 
 assign boat_maxspeed =
-  if      ( and waterway=river reversedirection=yes ) then sub speed_normal flow_rate 
+  if      ( and waterway=river reversedirection=yes ) then sub speed_normal flow_rate
   else if (     waterway=river )                      then add speed_normal flow_rate
   else speed_normal
 
 
 assign maxspeed_impl =
-  switch CEMT=0                     6
-  switch CEMT=I|II|III|IV           10
-  switch CEMT=V|Va|Vb               12
-  switch CEMT=VI|VIa|VIb|VIc|VII    15
-  20
-  
+  switch CEMT=0                     notdefined
+  switch CEMT=I|II|III|IV           notdefined
+  switch CEMT=V|Va|Vb               notdefined
+  switch CEMT=VI|VIa|VIb|VIc|VII    notdefined
+  notdefined
+
 assign maxspeed_expl =
   if  not maxspeed= then (
 	  switch maxspeed=4.5 4.5
@@ -136,9 +139,9 @@ assign maxspeed_expl =
 	  switch waterway:maxspeed= notdefined
 	  v:waterway:maxspeed
 
-assign maxspeed_defined 
-  switch lesser maxspeed_expl notdefined maxspeed_expl maxspeed_impl 
-  
+assign maxspeed_defined
+  switch lesser maxspeed_expl notdefined maxspeed_expl maxspeed_impl
+
 assign maxspeed =
   min maxspeed_defined boat_maxspeed
 
@@ -152,14 +155,15 @@ assign is_oneway
 
 assign costfactor
 	if  and not waterway= is_oneway 		then notdefined
-	else if  and use_CEMT 
+	else if  and use_CEMT
 	    and  not no_depth
         and not no_width
         and not no_height
 			not not_used	then (
       	1
     )
-    else (
+    else
+		(
         if      waterway=                   then notdefined
 		else if not_used                    then notdefined
 		else if no_depth                    then notdefined
@@ -167,52 +171,55 @@ assign costfactor
 		else if no_height                   then notdefined
         else if not useCEMTonly then (
 			switch waterway=canal|river|fairway|safe_water     1
-			switch seamark:type=fairway|recommended_track      1 
+			switch seamark:type=fairway|recommended_track      1
 #            switch not whitewater=                             1
-#			else if motorboat=yes           then 1
-#			else if ship=yes                then 1
+#				switch motorboat=yes            1
+#				switch boat=yes                 1
+#				switch ship=yes                 1
 			notdefined
 			)
 		else
-			notdefined	
+			notdefined
     )
 
 ---context:node  # following code refers to node tags
 
-assign free_height 
-	if seamark:bridge:category=opening then 
+assign free_height
+	if seamark:bridge:category=opening then
 	  switch  and not       seamark:bridge:clearance_height_closed=
-				  greater v:seamark:bridge:clearance_height_closed boat_height true 
+				  greater v:seamark:bridge:clearance_height_closed boat_height true
 	  false
 	else false
 
-assign waiting_height 
-	if seamark:bridge:category=opening then 
+assign waiting_height
+	if seamark:bridge:category=opening then
 	  switch  and not      seamark:bridge:clearance_height_closed=
-	              lesser v:seamark:bridge:clearance_height_closed boat_height true 
-	  switch  and not      seamark:bridge:clearance_height=
-	              lesser v:seamark:bridge:clearance_height boat_height true 
-	  false
-	else false
-
-assign no_height 
-	if seamark:bridge:category=opening then 
-	  switch  and not      seamark:bridge:clearance_height_open=
-	              lesser v:seamark:bridge:clearance_height_open boat_height true 
-	  false
-	else if seamark:bridge:category=fixed then 
+	              lesser v:seamark:bridge:clearance_height_closed boat_height true
 	  switch  and not      seamark:bridge:clearance_height=
 	              lesser v:seamark:bridge:clearance_height boat_height true
-	  switch  and not      seamark:bridge:clearance_height_safe=
-	              lesser v:seamark:bridge:clearance_height_safe boat_height true
+	  false
+	else false
+
+assign no_height
+	if seamark:bridge:category=opening then
+	  switch  and not      seamark:bridge:clearance_height_open=
+	              lesser v:seamark:bridge:clearance_height_open boat_height true
+	  false
+	else if seamark:bridge:category=fixed then
+	  switch  and not      seamark:bridge:clearance_height=
+	              lesser v:seamark:bridge:clearance_height boat_height true
+#	  switch  and not      maxheight=
+#	              lesser v:maxheight boat_height true
+#	  switch  and not      seamark:bridge:clearance_height_safe=
+#	              lesser v:seamark:bridge:clearance_height_safe boat_height true
       false
-	else 	if seamark:type=cable_overhead then 
-	  switch  and not      seamark:cable_overhead:clearance_height_safe=
-	              lesser v:seamark:cable_overhead:clearance_height_safe boat_height true 
+	else 	if seamark:type=cable_overhead then
 	  switch  and not      seamark:cable_overhead:clearance_height=
-	              lesser v:seamark:cable_overhead:clearance_height boat_height true 
-      false  
-	else 
+	              lesser v:seamark:cable_overhead:clearance_height boat_height true
+	  switch  and not      seamark:cable_overhead:clearance_height_safe=
+	              lesser v:seamark:cable_overhead:clearance_height_safe boat_height true
+      false
+	else
 	  false
 
 assign no_width
@@ -230,11 +237,12 @@ assign no_depth
 	switch and not      waterway:mindepth=
 	           lesser v:waterway:mindepth boat_draft true
 	false
-	
-assign initialcost 
+
+assign initialcost
+    switch waterway=weir       notdefined
 	switch no_width            notdefined
 	switch no_height           notdefined
 	switch no_depth            notdefined
 	switch waiting_height      waiting_bridge
 	switch waterway=lock_gate  waiting_lock
-	0
+	1
